@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -11,7 +12,7 @@ from leoflow_store.core.registry import WorkflowRegistry
 from leoflow_store.core.validator import resolve_version, validate_workflow_spec
 
 ROOT = Path(__file__).resolve().parents[1]
-LF = ROOT / "lf"
+CLI = [sys.executable, "-m", "leoflow_store.cli"]
 
 
 class CliSmokeTest(unittest.TestCase):
@@ -86,9 +87,10 @@ class CliSmokeTest(unittest.TestCase):
 
     def test_create_requires_name_and_output(self) -> None:
         result = subprocess.run(
-            [sys.executable, str(LF), "create"],
+            [*CLI, "create"],
             cwd=ROOT,
             capture_output=True,
+            env=_cli_env(),
             text=True,
         )
         self.assertNotEqual(result.returncode, 0)
@@ -96,12 +98,21 @@ class CliSmokeTest(unittest.TestCase):
 
     def _run(self, *args: object, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [sys.executable, str(LF), *[str(arg) for arg in args]],
+            [*CLI, *[str(arg) for arg in args]],
             cwd=cwd or ROOT,
             capture_output=True,
+            env=_cli_env(),
             text=True,
             check=True,
         )
+
+
+def _cli_env() -> dict[str, str]:
+    env = os.environ.copy()
+    pythonpath = env.get("PYTHONPATH")
+    root = str(ROOT)
+    env["PYTHONPATH"] = f"{root}{os.pathsep}{pythonpath}" if pythonpath else root
+    return env
 
 
 if __name__ == "__main__":
