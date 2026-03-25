@@ -1,3 +1,5 @@
+[![Docs](https://readthedocs.org/projects/leoflow-store/badge/?version=latest)](https://leoflow-store.readthedocs.io)
+
 # LeoFlow Store
 
 LeoFlow Store is a local workflow store and project generator for Earth observation workflows.
