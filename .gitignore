@@ -1,0 +1,8 @@
+.idea
+.venv
+venv
+lf
+.DS_Store
+__pycache__/
+leoflow_store.egg-info/
+dist

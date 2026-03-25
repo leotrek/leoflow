@@ -1,0 +1,16 @@
+site_name: LeoFlow Store
+site_description: Documentation for the LeoFlow workflow store and CLI.
+theme:
+  name: readthedocs
+nav:
+  - Overview: index.md
+  - Concepts: concepts.md
+  - CLI: cli.md
+  - Workflow Spec: workflow-spec.md
+  - Generated Project: generated-project.md
+  - Registry: registry.md
+  - Examples:
+      - Create And Run: examples/create-and-run.md
+      - Build From Spec: examples/build-from-spec.md
+      - Publish And Download: examples/publish-download.md
+      - Iberia Wildfire: examples/iberia-wildfire.md
