@@ -20,7 +20,10 @@ def main(ctx):
             "prediction_path": str(ctx.prediction_path),
             "reference_path": None,
             "status": "unavailable",
-            "reason": "The EarthCODE example compares against the remote SeasFire/GWIS cube. Add a local reference raster under resources/ to enable overlay scoring.",
+            "reason": (
+                "The EarthCODE example compares against the remote SeasFire/GWIS cube. "
+                "Add a local reference raster under resources/ to enable overlay scoring."
+            ),
         }
     else:
         reference = project_band(reference_path, profile, resampling=Resampling.nearest)

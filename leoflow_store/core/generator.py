@@ -533,7 +533,13 @@ def _task_runtime_module() -> str:
                     filename = f"{self.name}.json"
                 return self.artifact_path(filename)
 
-            def write_json(self, payload: JsonDict, *, filename: str | Path | None = None, path: str | Path | None = None) -> Path:
+            def write_json(
+                self,
+                payload: JsonDict,
+                *,
+                filename: str | Path | None = None,
+                path: str | Path | None = None,
+            ) -> Path:
                 target = Path(path) if path is not None else self.json_path(filename)
                 return write_json(target, _stringify_paths(payload))
 

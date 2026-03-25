@@ -192,7 +192,11 @@ class WorkflowApp:
         executor = self.spec["model"].get("executor")
         if executor:
             command_result = self._execute_command(executor, context, {"model_path": model_path})
-            artifact = command_result.get("artifact") if command_result else str(self.artifacts_dir / f"{self.spec['model']['output']}.tif")
+            artifact = (
+                command_result.get("artifact")
+                if command_result
+                else str(self.artifacts_dir / f"{self.spec['model']['output']}.tif")
+            )
             return {
                 "type": self.spec["model"]["type"],
                 "input": self.spec["model"]["input"],
@@ -275,7 +279,11 @@ class WorkflowApp:
             "prediction_artifact": context["prediction"].get("artifact"),
         }
         if context["evaluation"].get("tasks"):
-            artifacts["evaluation_reports"] = [task["artifact"] for task in context["evaluation"]["tasks"] if task.get("artifact")]
+            artifacts["evaluation_reports"] = [
+                task["artifact"]
+                for task in context["evaluation"]["tasks"]
+                if task.get("artifact")
+            ]
         return {
             "workflow": self.spec["workflow"]["name"],
             "runtime": self.runtime_name,
@@ -300,7 +308,13 @@ class WorkflowApp:
 
     def _run_task_module(self, group: str, task_name: str, args: dict[str, str | Path]) -> dict[str, Any]:
         started_at, started_perf = self._log_start("task", f"{group}/{task_name}")
-        command = [sys.executable, "-m", f"tasks.{group}.{task_name}", "--workflow", str(self.project_root / "workflow.yaml")]
+        command = [
+            sys.executable,
+            "-m",
+            f"tasks.{group}.{task_name}",
+            "--workflow",
+            str(self.project_root / "workflow.yaml"),
+        ]
         for key, value in args.items():
             command.extend([key, str(value)])
         try:

@@ -35,7 +35,10 @@ class ExecutableRuntimeTest(unittest.TestCase):
                     "preprocessing": [
                         {
                             "command": {
-                                "run": 'mkdir -p "{preprocess_dir}" && cp "{data_dir}/item-1/B04.tif" "{preprocess_dir}/B04.tif"',
+                                "run": (
+                                    'mkdir -p "{preprocess_dir}" && '
+                                    'cp "{data_dir}/item-1/B04.tif" "{preprocess_dir}/B04.tif"'
+                                ),
                                 "output": "{preprocess_dir}",
                             }
                         }
@@ -88,14 +91,61 @@ class ExecutableRuntimeTest(unittest.TestCase):
             self.assertIn("[finish] task features/ndvi", result.stderr)
             self.assertIn("duration=", result.stderr)
             self.assertTrue((project_dir / "workflow.yaml").exists())
-            self.assertTrue((project_dir / "artifacts" / "wildfire-download-runner" / "data" / "raw" / "item-1" / "B04.tif").exists())
-            self.assertTrue((project_dir / "artifacts" / "wildfire-download-runner" / "models" / "model.onnx").exists())
-            self.assertTrue((project_dir / "artifacts" / "wildfire-download-runner" / "preprocessed" / "B04.tif").exists())
-            self.assertTrue((project_dir / "artifacts" / "wildfire-download-runner" / "predictions" / "fire_mask.onnx").exists())
-            self.assertTrue((project_dir / "artifacts" / "wildfire-download-runner" / "evaluation.json").exists())
+            self.assertTrue(
+                (
+                    project_dir
+                    / "artifacts"
+                    / "wildfire-download-runner"
+                    / "data"
+                    / "raw"
+                    / "item-1"
+                    / "B04.tif"
+                ).exists()
+            )
+            self.assertTrue(
+                (
+                    project_dir
+                    / "artifacts"
+                    / "wildfire-download-runner"
+                    / "models"
+                    / "model.onnx"
+                ).exists()
+            )
+            self.assertTrue(
+                (
+                    project_dir
+                    / "artifacts"
+                    / "wildfire-download-runner"
+                    / "preprocessed"
+                    / "B04.tif"
+                ).exists()
+            )
+            self.assertTrue(
+                (
+                    project_dir
+                    / "artifacts"
+                    / "wildfire-download-runner"
+                    / "predictions"
+                    / "fire_mask.onnx"
+                ).exists()
+            )
+            self.assertTrue(
+                (
+                    project_dir
+                    / "artifacts"
+                    / "wildfire-download-runner"
+                    / "evaluation.json"
+                ).exists()
+            )
             self.assertEqual(
                 Path(payload["prediction"]["artifact"]).resolve(),
-                (project_dir / "artifacts" / "wildfire-download-runner" / "predictions" / "fire_mask.onnx").resolve(),
+                (
+                    project_dir
+                    / "artifacts"
+                    / "wildfire-download-runner"
+                    / "predictions"
+                    / "fire_mask.onnx"
+                ).resolve(),
             )
 
     def _build_fixture(self, root: Path) -> Path:

@@ -27,7 +27,10 @@ def build_parser() -> argparse.ArgumentParser:
     create_parser = subparsers.add_parser(
         "create",
         help="Create a workflow project.",
-        description="Create a workflow project in the given output directory from an example workflow template.",
+        description=(
+            "Create a workflow project in the given output directory "
+            "from an example workflow template."
+        ),
     )
     create_parser.add_argument("name", help="Workflow name.")
     create_parser.add_argument("output", help="Directory where the workflow project should be created.")
@@ -48,10 +51,17 @@ def build_parser() -> argparse.ArgumentParser:
     list_parser = subparsers.add_parser(
         "list",
         help="List example workflows or registry entries.",
-        description="List example workflows from examples/ by default, or registry entries with --registry.",
+        description=(
+            "List example workflows from examples/ by default, "
+            "or registry entries with --registry."
+        ),
     )
     list_parser.add_argument("query", nargs="?", help="Optional search query.")
-    list_parser.add_argument("--registry", action="store_true", help="List workflows from the local registry instead of examples/.")
+    list_parser.add_argument(
+        "--registry",
+        action="store_true",
+        help="List workflows from the local registry instead of examples/.",
+    )
     list_parser.add_argument("--registry-root", help="Registry directory. Defaults to ./registry.")
     list_parser.add_argument("--json", action="store_true", help="Emit JSON.")
     list_parser.set_defaults(handler=_handle_list)
@@ -77,15 +87,27 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run workflow tests.",
         description="Run workflow tests.",
     )
-    test_parser.add_argument("target", nargs="?", default=".", help="Generated app directory, workflow directory, or workflow.yaml path.")
+    test_parser.add_argument(
+        "target",
+        nargs="?",
+        default=".",
+        help="Generated app directory, workflow directory, or workflow.yaml path.",
+    )
     test_parser.add_argument(
         "--template",
         default=DEFAULT_TEMPLATE,
         choices=template_names(),
         help="Template to use when testing from a workflow spec.",
     )
-    test_parser.add_argument("--version", help="Override the workflow version when testing from a workflow spec.")
-    test_parser.add_argument("--keep-build", action="store_true", help="Keep the temporary generated build when testing from a workflow spec.")
+    test_parser.add_argument(
+        "--version",
+        help="Override the workflow version when testing from a workflow spec.",
+    )
+    test_parser.add_argument(
+        "--keep-build",
+        action="store_true",
+        help="Keep the temporary generated build when testing from a workflow spec.",
+    )
     test_parser.set_defaults(handler=_handle_test)
 
     delete_parser = subparsers.add_parser(
@@ -95,7 +117,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     delete_parser.add_argument("target", help="Filesystem path or registry workflow name.")
     delete_parser.add_argument("--version", help="Registry version to delete.")
-    delete_parser.add_argument("--registry", action="store_true", help="Delete from the local registry instead of the filesystem.")
+    delete_parser.add_argument(
+        "--registry",
+        action="store_true",
+        help="Delete from the local registry instead of the filesystem.",
+    )
     delete_parser.add_argument("--registry-root", help="Registry directory. Defaults to ./registry.")
     delete_parser.add_argument("--yes", action="store_true", help="Delete without prompting.")
     delete_parser.set_defaults(handler=_handle_delete)

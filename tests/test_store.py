@@ -49,8 +49,12 @@ class StoreSmokeTest(unittest.TestCase):
             self.assertTrue((build_dir / "tasks" / "evaluation" / "temporal_consistency.py").exists())
             self.assertTrue((build_dir / "resources" / "README.md").exists())
             self.assertTrue((build_dir / "resources" / "polygon.geojson").exists())
-            self.assertIn("resources/polygon.geojson", (build_dir / "workflow.yaml").read_text(encoding="utf-8"))
-            self.assertIn("api_url: https://earth-search.aws.element84.com/v1/search", (build_dir / "workflow.yaml").read_text(encoding="utf-8"))
+            workflow_text = (build_dir / "workflow.yaml").read_text(encoding="utf-8")
+            self.assertIn("resources/polygon.geojson", workflow_text)
+            self.assertIn(
+                "api_url: https://earth-search.aws.element84.com/v1/search",
+                workflow_text,
+            )
             polygon = (build_dir / "resources" / "polygon.geojson").read_text(encoding="utf-8")
             self.assertIn("[19.3, 34.8]", polygon)
             data_task_source = (build_dir / "tasks" / "data" / "stac_sentinel_2.py").read_text(encoding="utf-8")

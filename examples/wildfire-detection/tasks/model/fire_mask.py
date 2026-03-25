@@ -9,7 +9,6 @@ from tasks.lib.eo import (
     latest_preprocess_dir,
     read_raster,
     stats,
-    write_json,
     write_mask_overlay_png,
     write_uint8_raster,
 )

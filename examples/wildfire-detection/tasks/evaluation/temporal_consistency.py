@@ -11,7 +11,10 @@ def main(ctx):
         "prediction_path": str(ctx.prediction_path),
         "score": None,
         "status": "unavailable",
-        "reason": "temporal consistency needs multiple timestamps or reference history, but this runnable example uses a single scene",
+        "reason": (
+            "temporal consistency needs multiple timestamps or reference history, "
+            "but this runnable example uses a single scene"
+        ),
     }
     summary_path = ctx.write_json(payload)
     return ctx.result(
