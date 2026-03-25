@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install system dependencies
+      - name: Install system dependencies (optional, for EO libs)
         run: |
           sudo apt-get update
           sudo apt-get install -y gdal-bin libgdal-dev
@@ -33,11 +33,16 @@ jobs:
           pip install flake8
           pip install -r requirements.txt
 
-      - name: Lint with flake8
+      - name: Lint with flake8 (safe for any repo structure)
         run: |
-          flake8 app.py tasks runtime tests --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 app.py tasks runtime tests --count --max-complexity=10 --max-line-length=127 --statistics
+          python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          python -m flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Run unit tests
         run: |
           python -m unittest discover -s tests -p "test_*.py"
+
+      - name: Check MkDocs build
+        run: |
+          pip install mkdocs
+          mkdocs build --strict
