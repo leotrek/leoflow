@@ -1,0 +1,62 @@
+workflow:
+  name: iberia-wildfire-detection
+  version: 0.1.0
+  title: Iberia Wildfire Detection
+  description: 'Reproduces the EarthCODE real-world wildfire workflow over Iberia:
+    fetch pre-fire and post-fire Sentinel-2 imagery, build mean composites, compute
+    NBR for each period, derive dNBR, threshold the result into a burned-area mask,
+    and compare it with GWIS burned-area data when a local reference raster is available.
+
+    '
+  notebook: https://github.com/pangeo-data/pangeo-openeo-BiDS-2023/blob/main/tutorial/examples/dask/wildfires_daskgateway.ipynb
+data:
+  source:
+    kind: stac
+    name: stac_sentinel_2
+    api_url: https://earth-search.aws.element84.com/v1/search
+    collection: sentinel-2-l2a
+    assets:
+    - nir
+    - swir22
+    limit: 100
+    query:
+      eo:cloud_cover:
+        lt: 20
+  region: resources/aoi/feature.geojson
+  time: 2020-08-07/2020-10-20
+  windows:
+    pre_fire: 2020-08-07/2020-09-06
+    post_fire: 2020-09-20/2020-10-20
+  reference_event_date: 2020-09-13
+  resolution: 10m
+  crs: EPSG:32629
+  groupby: datetime
+preprocessing:
+- pre_fire_composite: mean
+- post_fire_composite: mean
+- reproject: EPSG:32629
+- resample: 10m
+- align_grid: post_fire
+features:
+- pre_fire_nbr
+- post_fire_nbr
+- delta_nbr
+model:
+  type: threshold
+  input: delta_nbr
+  output: burned_area_mask
+  parameters:
+    threshold: 0.27
+    threshold_name: burned_area_mask
+evaluation:
+  metrics:
+  - burned_area_ha
+  - gwis_overlay
+  reference:
+    source: gwis
+    dataset: burned_area
+    comparison: overlay
+publication:
+  dataset_id: dnbr_dataset.zarr
+  collection_id: pangeo-test
+  access_link: s3://pangeo-test-fires

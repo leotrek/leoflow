@@ -1,0 +1,40 @@
+workflow:
+  name: wildfire-detection
+  version: 0.1.0
+
+data:
+  source:
+    kind: stac
+    name: stac_sentinel_2
+    api_url: https://earth-search.aws.element84.com/v1/search
+    collection: sentinel-2-l2a
+    assets:
+      - blue
+      - green
+      - red
+      - nir
+      - swir22
+      - scl
+    limit: 64
+  region: polygon.geojson
+  time: 2025-06-01/2025-08-01
+  resolution: 10m
+
+preprocessing:
+  - cloud_mask: s2cloudless
+  - resample: 10m
+  - align_time: 5d
+
+features:
+  - ndvi
+  - ndwi
+
+model:
+  type: segmentation
+  input: patches(256x256)
+  output: fire_mask
+
+evaluation:
+  metrics:
+    - iou
+    - temporal_consistency

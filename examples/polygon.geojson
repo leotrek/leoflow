@@ -1,0 +1,18 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [19.3, 34.8],
+        [28.3, 34.8],
+        [28.3, 41.9],
+        [19.3, 41.9],
+        [19.3, 34.8]
+      ]
+    ]
+  },
+  "properties": {
+    "name": "greece-example-region"
+  }
+}
