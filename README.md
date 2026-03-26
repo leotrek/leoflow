@@ -1,4 +1,4 @@
-[![Docs](https://app.readthedocs.org/projects/leodust/badge/?version=latest?version=latest)](https://leoflow-store.readthedocs.io)
+[![Docs](https://readthedocs.org/projects/leoflow-store/badge/?version=latest)](https://leoflow-store.readthedocs.io)
 
 # LeoFlow Store
 
