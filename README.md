@@ -57,6 +57,19 @@ pip install -r requirements.txt
 python app.py
 ```
 
+Run the example project:
+
+```bash
+cd examples/wildfire-detection
+
+python3 -m venv .venv
+source .venv/bin/activate
+
+pip install -r requirements.txt
+python app.py
+```
+
+
 Build from an existing workflow spec:
 
 ```bash

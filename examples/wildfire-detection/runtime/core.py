@@ -104,6 +104,15 @@ class WorkflowApp:
                 )
 
         if isinstance(source, dict):
+            task_name = _task_slug(source.get("name") or source.get("kind") or "data_source")
+            if self._task_exists("data", task_name):
+                return self._run_task_module(
+                    "data",
+                    task_name,
+                    {
+                        "--output-dir": self.artifacts_dir / "data" / "raw",
+                    },
+                )
             kind = source.get("kind", "").lower()
             if kind == "stac":
                 return self._download_stac_source(source)

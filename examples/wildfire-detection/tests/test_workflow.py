@@ -6,11 +6,14 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 try:
     import yaml
 except ImportError as exc:  # pragma: no cover - exercised only in broken envs
     raise RuntimeError("PyYAML is required. Install dependencies with `pip install -r requirements.txt`.") from exc
+
+from runtime.core import WorkflowApp
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -66,6 +69,26 @@ class GeneratedWorkflowTest(unittest.TestCase):
         self.assertEqual(payload["status"], "completed")
         self.assertTrue((ROOT / "artifacts" / "wildfire-detection" / "last-run.json").exists())
         self.assertTrue(Path(payload["prediction"]["artifact"]).exists())
+
+    def test_dict_source_prefers_generated_data_task(self) -> None:
+        spec = yaml.safe_load((ROOT / "workflow.yaml").read_text(encoding="utf-8"))
+        app = WorkflowApp(spec, runtime_name="python-minimal", project_root=ROOT)
+
+        with (
+            mock.patch.object(app, "_task_exists", return_value=True) as task_exists,
+            mock.patch.object(app, "_run_task_module", return_value={"status": "loaded"}) as run_task,
+            mock.patch.object(app, "_download_stac_source") as download_stac,
+        ):
+            result = app.default_load_data({"spec": spec})
+
+        task_exists.assert_called_once_with("data", "stac_sentinel_2")
+        run_task.assert_called_once_with(
+            "data",
+            "stac_sentinel_2",
+            {"--output-dir": app.artifacts_dir / "data" / "raw"},
+        )
+        download_stac.assert_not_called()
+        self.assertEqual(result, {"status": "loaded"})
 
     def _slug(self, value: object) -> str:
         if isinstance(value, dict):
