@@ -1,4 +1,4 @@
-[![Docs](https://readthedocs.org/projects/leoflow-store/badge/?version=latest)](https://leoflow-store.readthedocs.io)
+[![Docs](https://readthedocs.org/projects/leoflow/badge/?version=latest)](https://leoflow.readthedocs.io)
 
 # LeoFlow Store
 
@@ -12,24 +12,6 @@ It lets you:
 - test generated workflows
 - publish and download versioned bundles from a local registry
 
-Detailed documentation lives under [docs/index.md](/Users/kenia/workspace/leoflow/docs/index.md#L1). A browsable docs site is configured in [mkdocs.yml](/Users/kenia/workspace/leoflow/mkdocs.yml#L1).
-
-## Read The Docs
-
-Choose one of these entry points:
-
-- hosted docs: `https://leoflow-store.readthedocs.io`
-- repo docs index: [docs/index.md](/Users/kenia/workspace/leoflow/docs/index.md#L1)
-- CLI reference: [docs/cli.md](/Users/kenia/workspace/leoflow/docs/cli.md#L1)
-
-Serve the docs locally with MkDocs:
-
-```bash
-python -m pip install mkdocs
-mkdocs serve
-```
-
-Then open the local URL printed by MkDocs.
 
 ## Install
 
@@ -39,18 +21,17 @@ Install the CLI locally:
 python -m pip install -e .
 lf help
 ```
-
-Build a package:
-
-```bash
-python -m pip install build
-python -m build
-```
-
 Uninstall:
 
 ```bash
 python -m pip uninstall leoflow-store
+```
+## Running An Example Project
+
+Run the example project:
+
+```bash
+lf run examples/iberia-wildfire-detection --setup
 ```
 
 ## Quick Start
@@ -79,12 +60,6 @@ If you want LeoFlow to create a project-local virtualenv and install requirement
 
 ```bash
 lf run ./wildfire-demo --setup
-```
-
-Run the example project:
-
-```bash
-lf run examples/wildfire-detection --setup
 ```
 
 ## How To Run
