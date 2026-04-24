@@ -61,15 +61,15 @@ class ExecutableRuntimeTest(unittest.TestCase):
                         },
                     },
                     "evaluation": {
-                    "metrics": ["iou"],
-                    "executor": {
-                        "run": (
-                            'mkdir -p "{outputs_dir}/evaluation" && '
-                            'printf "iou ok\\n" > "{outputs_dir}/evaluation/evaluation.json"'
-                        ),
-                        "artifact": "{outputs_dir}/evaluation/evaluation.json",
+                        "metrics": ["iou"],
+                        "executor": {
+                            "run": (
+                                'mkdir -p "{outputs_dir}/evaluation" && '
+                                'printf "iou ok\\n" > "{outputs_dir}/evaluation/evaluation.json"'
+                            ),
+                            "artifact": "{outputs_dir}/evaluation/evaluation.json",
+                        },
                     },
-                },
                 }
             )
             version = resolve_version(spec)
