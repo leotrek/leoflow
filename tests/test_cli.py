@@ -258,7 +258,10 @@ class CliSmokeTest(unittest.TestCase):
                 "evaluation": {
                     "metrics": ["iou"],
                     "executor": {
-                        "run": 'mkdir -p "{outputs_dir}/evaluation" && printf "iou ok\\n" > "{outputs_dir}/evaluation/evaluation.json"',
+                        "run": (
+                            'mkdir -p "{outputs_dir}/evaluation" && '
+                            'printf "iou ok\\n" > "{outputs_dir}/evaluation/evaluation.json"'
+                        ),
                         "artifact": "{outputs_dir}/evaluation/evaluation.json",
                     },
                 },
