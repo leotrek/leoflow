@@ -6,13 +6,15 @@ The main command is `lf`.
 lf help
 ```
 
-Most users only need these run commands:
+Most users only need these run and test commands:
 
 ```bash
 lf run examples/wildfire-detection --setup
 lf run ./my-workflow --setup
 lf run ./my-workflow
 lf run examples/wildfire-detection/workflow.yaml
+lf test examples/wildfire-detection
+lf test ./my-workflow
 ```
 
 ## Top-Level Commands

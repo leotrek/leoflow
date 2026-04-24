@@ -55,5 +55,5 @@ Notes:
 Test:
 
 ```bash
-python3 -m unittest discover -s tests -p 'test_*.py'
+lf test examples/wildfire-detection
 ```

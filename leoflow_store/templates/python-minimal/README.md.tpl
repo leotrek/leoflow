@@ -48,7 +48,7 @@ Whether it executes real EO work depends on the task implementations and workflo
 Run the generated test:
 
 ```bash
-python3 -m unittest discover -s tests -p 'test_*.py'
+lf test .
 ```
 
 Recommended edit points:

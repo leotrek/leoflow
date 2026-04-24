@@ -98,6 +98,18 @@ Run directly from a workflow spec without a separate build step:
 lf run examples/wildfire-detection/workflow.yaml
 ```
 
+Test a checked-in example:
+
+```bash
+lf test examples/wildfire-detection
+```
+
+Test directly from a workflow spec:
+
+```bash
+lf test examples/wildfire-detection/workflow.yaml
+```
+
 ## Documentation Map
 
 - [Concepts](concepts.md): store model and object lifecycle

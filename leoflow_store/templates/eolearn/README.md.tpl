@@ -32,7 +32,7 @@ lf run . --setup
 Run the generated test:
 
 ```bash
-python3 -m unittest discover -s tests -p 'test_*.py'
+lf test .
 ```
 
 Relative GeoJSON paths from the input spec are placed under `resources/` in the generated bundle.

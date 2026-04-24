@@ -97,6 +97,15 @@ Common run flows:
 - run directly from a workflow spec: `lf run examples/wildfire-detection/workflow.yaml`
 - generate a reusable build and run it: `lf run examples/wildfire-detection --keep-build`
 
+## How To Test
+
+Common test flows:
+
+- test a checked-in example: `lf test examples/wildfire-detection`
+- test a generated project: `lf test ./wildfire-demo`
+- test directly from a workflow spec: `lf test examples/wildfire-detection/workflow.yaml`
+- generate a reusable build and test it: `lf test examples/wildfire-detection --keep-build`
+
 
 Build from an existing workflow spec:
 

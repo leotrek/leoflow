@@ -76,5 +76,5 @@ Common edits:
 ## 7. Run the generated tests
 
 ```bash
-python -m unittest discover -s tests -p 'test_*.py'
+lf test ./wildfire-demo
 ```
