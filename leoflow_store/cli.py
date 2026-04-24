@@ -110,6 +110,46 @@ def build_parser() -> argparse.ArgumentParser:
     )
     test_parser.set_defaults(handler=_handle_test)
 
+    run_parser = subparsers.add_parser(
+        "run",
+        help="Run a workflow project.",
+        description=(
+            "Run a generated workflow project directly, or generate-and-run from a workflow spec."
+        ),
+    )
+    run_parser.add_argument(
+        "target",
+        nargs="?",
+        default=".",
+        help="Runnable project directory, workflow directory, or workflow.yaml path.",
+    )
+    run_parser.add_argument(
+        "--template",
+        default=DEFAULT_TEMPLATE,
+        choices=template_names(),
+        help="Template to use when running from a workflow spec.",
+    )
+    run_parser.add_argument(
+        "--version",
+        help="Override the workflow version when running from a workflow spec.",
+    )
+    run_parser.add_argument(
+        "--keep-build",
+        action="store_true",
+        help="Keep the generated build when running from a workflow spec.",
+    )
+    run_parser.add_argument(
+        "--setup",
+        action="store_true",
+        help="Create or refresh a local virtualenv and install requirements before running.",
+    )
+    run_parser.add_argument(
+        "--venv-dir",
+        default=".venv",
+        help="Virtualenv directory to create or reuse inside the project. Default: .venv",
+    )
+    run_parser.set_defaults(handler=_handle_run)
+
     delete_parser = subparsers.add_parser(
         "delete",
         help="Delete a generated workflow directory or a registry entry.",
@@ -210,6 +250,32 @@ def _handle_test(args: argparse.Namespace, parser: argparse.ArgumentParser) -> i
     return 0
 
 
+def _handle_run(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
+    target = Path(args.target).resolve()
+    if _is_runnable_project_dir(target):
+        _run_workflow_in_dir(target, setup=args.setup, venv_dir=args.venv_dir)
+        print(f"ran {target}")
+        return 0
+
+    workflow_path = _resolve_workflow_path(target)
+    spec = validate_workflow_spec(load_workflow(workflow_path))
+    version = resolve_version(spec, args.version)
+
+    if args.keep_build:
+        build_dir = Path("build") / workflow_slug(spec)
+        generate_project(spec, version, args.template, build_dir, workflow_path=workflow_path)
+        _run_workflow_in_dir(build_dir, setup=args.setup, venv_dir=args.venv_dir)
+        print(f"generated and ran {build_dir}")
+        return 0
+
+    with tempfile.TemporaryDirectory(prefix="lf-run-") as temp_dir:
+        build_dir = Path(temp_dir) / workflow_slug(spec)
+        generate_project(spec, version, args.template, build_dir, workflow_path=workflow_path)
+        _run_workflow_in_dir(build_dir, setup=args.setup, venv_dir=args.venv_dir)
+    print(f"generated and ran {spec['workflow']['name']}")
+    return 0
+
+
 def _handle_delete(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
     if args.registry:
         registry = WorkflowRegistry(args.registry_root)
@@ -260,12 +326,55 @@ def _is_generated_bundle_dir(path: Path) -> bool:
     return path.is_dir() and (path / "app.py").exists() and (path / "tests").is_dir()
 
 
+def _is_runnable_project_dir(path: Path) -> bool:
+    return path.is_dir() and (path / "app.py").exists() and (path / "workflow.yaml").exists()
+
+
 def _run_tests_in_dir(path: Path) -> None:
     subprocess.run(
         [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"],
         cwd=path,
         check=True,
     )
+
+
+def _run_workflow_in_dir(path: Path, *, setup: bool, venv_dir: str) -> None:
+    python_executable = _resolve_python_for_run(path, setup=setup, venv_dir=venv_dir)
+    subprocess.run([str(python_executable), "app.py"], cwd=path, check=True)
+
+
+def _resolve_python_for_run(path: Path, *, setup: bool, venv_dir: str) -> Path:
+    venv_path = path / venv_dir
+    venv_python = _venv_python_path(venv_path)
+    if setup:
+        _ensure_virtualenv(venv_path)
+        requirements_path = path / "requirements.txt"
+        if requirements_path.exists():
+            _install_requirements(path, requirements_path, venv_python)
+        return venv_python
+    if venv_python.exists():
+        return venv_python
+    return Path(sys.executable)
+
+
+def _ensure_virtualenv(venv_path: Path) -> None:
+    if _venv_python_path(venv_path).exists():
+        return
+    subprocess.run([sys.executable, "-m", "venv", str(venv_path)], check=True)
+
+
+def _install_requirements(project_dir: Path, requirements_path: Path, python_executable: Path) -> None:
+    subprocess.run(
+        [str(python_executable), "-m", "pip", "install", "-r", str(requirements_path)],
+        cwd=project_dir,
+        check=True,
+    )
+
+
+def _venv_python_path(venv_path: Path) -> Path:
+    if sys.platform == "win32":
+        return venv_path / "Scripts" / "python.exe"
+    return venv_path / "bin" / "python"
 
 
 def _confirm_or_exit(assume_yes: bool, prompt: str) -> None:

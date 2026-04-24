@@ -34,9 +34,13 @@ lf test build/wildfire-detection
 ## 4. Run the app
 
 ```bash
-cd build/wildfire-detection
-pip install -r requirements.txt
-python app.py
+lf run build/wildfire-detection
+```
+
+Or let LeoFlow create a local virtualenv for the generated build:
+
+```bash
+lf run build/wildfire-detection --setup
 ```
 
 ## 5. Rebuild after changing the source workflow

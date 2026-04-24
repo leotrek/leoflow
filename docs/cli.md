@@ -6,11 +6,21 @@ The main command is `lf`.
 lf help
 ```
 
+Most users only need these run commands:
+
+```bash
+lf run examples/wildfire-detection --setup
+lf run ./my-workflow --setup
+lf run ./my-workflow
+lf run examples/wildfire-detection/workflow.yaml
+```
+
 ## Top-Level Commands
 
 - `lf create`: create a new project from an example workflow template
 - `lf list`: list example workflow templates or registry entries
 - `lf build`: build a runnable project from a workflow spec
+- `lf run`: run a generated project directly or generate-and-run from a workflow spec
 - `lf test`: run tests for a generated project or generate-and-test from a workflow spec
 - `lf delete`: delete a generated project directory or a registry entry
 - `lf help`: show help for the CLI or a specific command
@@ -120,6 +130,29 @@ Examples:
 lf test build/wildfire-detection
 lf test examples/wildfire-detection
 lf test examples/wildfire-detection --keep-build
+```
+
+## `lf run`
+
+Run a generated project directly, or generate a temporary build and run that.
+
+```bash
+lf run [target] [--template <runtime-template>] [--version <semver>] [--keep-build] [--setup] [--venv-dir <dir>]
+```
+
+Behavior:
+
+- if `target` is already a runnable project, LeoFlow runs `app.py` in that directory
+- if `target` is a workflow directory or a `workflow.yaml`, LeoFlow generates a project first and runs that
+- if `--setup` is set, LeoFlow creates or reuses a project-local virtualenv and runs `python -m pip install -r requirements.txt` before execution
+- if a virtualenv already exists under `--venv-dir`, LeoFlow uses it automatically even without `--setup`
+
+Examples:
+
+```bash
+lf run build/wildfire-detection
+lf run examples/wildfire-detection --setup
+lf run examples/wildfire-detection/workflow.yaml --keep-build
 ```
 
 ## `lf delete`

@@ -20,8 +20,13 @@ Files:
 Run:
 
 ```bash
-pip install -r requirements.txt
-python3 app.py
+lf run .
+```
+
+If you want LeoFlow to create or refresh a local virtualenv before running:
+
+```bash
+lf run . --setup
 ```
 
 Run the generated test:
@@ -31,3 +36,4 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
 Relative GeoJSON paths from the input spec are placed under `resources/` in the generated bundle.
+LeoFlow writes runtime artifacts under `artifacts/{{WORKFLOW_SLUG}}/inputs/`, `artifacts/{{WORKFLOW_SLUG}}/outputs/`, and `artifacts/{{WORKFLOW_SLUG}}/reports/`.

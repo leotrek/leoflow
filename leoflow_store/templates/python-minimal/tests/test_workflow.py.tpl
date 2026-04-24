@@ -64,7 +64,16 @@ class GeneratedWorkflowTest(unittest.TestCase):
         self.assertEqual(payload["workflow"], "{{WORKFLOW_NAME}}")
         self.assertEqual(payload["runtime"], "{{RUNTIME_NAME}}")
         self.assertEqual(payload["status"], "completed")
-        self.assertTrue((ROOT / "artifacts" / "{{WORKFLOW_SLUG}}" / "last-run.json").exists())
+        self.assertTrue((ROOT / "artifacts" / "{{WORKFLOW_SLUG}}" / "reports" / "last-run.json").exists())
+        self.assertTrue((ROOT / "artifacts" / "{{WORKFLOW_SLUG}}" / "reports" / "io-manifest.json").exists())
+        self.assertEqual(
+            Path(payload["inputs"]["workflow_yaml"]).resolve(),
+            (ROOT / "workflow.yaml").resolve(),
+        )
+        self.assertIn(
+            str((ROOT / "artifacts" / "{{WORKFLOW_SLUG}}" / "reports" / "last-run.json").resolve()),
+            payload["reports"]["files"],
+        )
         self.assertTrue(Path(payload["prediction"]["artifact"]).exists())
 
     def _slug(self, value: object) -> str:

@@ -67,7 +67,16 @@ class GeneratedWorkflowTest(unittest.TestCase):
         self.assertEqual(payload["workflow"], "wildfire-detection")
         self.assertEqual(payload["runtime"], "python-minimal")
         self.assertEqual(payload["status"], "completed")
-        self.assertTrue((ROOT / "artifacts" / "wildfire-detection" / "last-run.json").exists())
+        self.assertTrue((ROOT / "artifacts" / "wildfire-detection" / "reports" / "last-run.json").exists())
+        self.assertTrue((ROOT / "artifacts" / "wildfire-detection" / "reports" / "io-manifest.json").exists())
+        self.assertEqual(
+            Path(payload["inputs"]["workflow_yaml"]).resolve(),
+            (ROOT / "workflow.yaml").resolve(),
+        )
+        self.assertIn(
+            str((ROOT / "artifacts" / "wildfire-detection" / "reports" / "last-run.json").resolve()),
+            payload["reports"]["files"],
+        )
         self.assertTrue(Path(payload["prediction"]["artifact"]).exists())
 
     def test_dict_source_prefers_generated_data_task(self) -> None:
@@ -85,7 +94,7 @@ class GeneratedWorkflowTest(unittest.TestCase):
         run_task.assert_called_once_with(
             "data",
             "stac_sentinel_2",
-            {"--output-dir": app.artifacts_dir / "data" / "raw"},
+            {"--output-dir": app.inputs_dir / "data" / "raw"},
         )
         download_stac.assert_not_called()
         self.assertEqual(result, {"status": "loaded"})

@@ -6,3 +6,4 @@ lf
 __pycache__/
 leoflow_store.egg-info/
 dist
+artifacts/

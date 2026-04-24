@@ -59,9 +59,13 @@ python -m leoflow_store.api.download wildfire-detection --version 0.1.0 --output
 ## 5. Run the downloaded bundle
 
 ```bash
-cd downloads/wildfire-detection
-pip install -r requirements.txt
-python app.py
+lf run downloads/wildfire-detection
+```
+
+If the downloaded bundle does not already have a virtualenv:
+
+```bash
+lf run downloads/wildfire-detection --setup
 ```
 
 ## 6. Delete a registry entry

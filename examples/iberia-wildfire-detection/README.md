@@ -1,6 +1,6 @@
 # iberia-wildfire-detection
 
-Runnable EOFlowSpec app derived from [examples/real-world-wildfire](/Users/kenia/workspace/leoflow/examples/real-world-wildfire/README.md#L1).
+Runnable EOFlowSpec app derived from [ESA EarthCODE Tutorial](https://github.com/ESA-EarthCODE/bids2025-tutorial).
 
 This bundle reproduces the Iberia dNBR workflow from the EarthCODE example:
 
@@ -30,24 +30,30 @@ Editable vs generated:
 Run:
 
 ```bash
-pip install -r requirements.txt
-python3 app.py
+lf run examples/iberia-wildfire-detection
+```
+
+To let LeoFlow create a project-local virtualenv and install dependencies first:
+
+```bash
+lf run examples/iberia-wildfire-detection --setup
 ```
 
 Important outputs:
 
-- `artifacts/iberia-wildfire-detection/data/`: STAC search results and raw downloaded scenes
-- `artifacts/iberia-wildfire-detection/preprocessed/pre_fire_composite/`: aligned period composites
-- `artifacts/iberia-wildfire-detection/features/`: `pre_fire_nbr.tif`, `post_fire_nbr.tif`, `delta_nbr.tif`
-- `artifacts/iberia-wildfire-detection/burned_area_mask.tif`: thresholded burned-area raster
-- `artifacts/iberia-wildfire-detection/burned_area_mask_preview.png`: quick-look preview
-- `artifacts/iberia-wildfire-detection/evaluation/`: evaluation JSON reports
-- `artifacts/iberia-wildfire-detection/last-run.json`: full workflow run report
+- `artifacts/iberia-wildfire-detection/inputs/data/`: STAC search results and raw downloaded scenes
+- `artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/`: aligned period composites
+- `artifacts/iberia-wildfire-detection/outputs/features/`: `pre_fire_nbr.tif`, `post_fire_nbr.tif`, `delta_nbr.tif`
+- `artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.tif`: thresholded burned-area raster
+- `artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask_preview.png`: quick-look preview
+- `artifacts/iberia-wildfire-detection/outputs/evaluation/`: evaluation JSON reports
+- `artifacts/iberia-wildfire-detection/reports/last-run.json`: full workflow run report
 
 Notes:
 
 - the workflow uses a custom `tasks/data/stac_sentinel_2.py` task even though `data.source` is a mapping; the runtime now prefers a named data task when `data.source.name` is present
 - `gwis_overlay` is only fully available if you add a local raster such as `resources/reference-burned-area.tif`; the original notebook uses the remote SeasFire/GWIS cube, which is not bundled here
+- `artifacts/iberia-wildfire-detection/reports/last-run.json` includes `inputs`, `outputs`, and `reports`, and `artifacts/iberia-wildfire-detection/reports/io-manifest.json` gives the same execution I/O summary in a dedicated file
 
 Tests:
 

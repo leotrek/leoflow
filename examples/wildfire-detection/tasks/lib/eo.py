@@ -227,10 +227,21 @@ def latest_preprocess_dir(workflow_path: str | Path, artifacts_dir: str | Path) 
         name = next(iter(step.keys()))
         if name != "command":
             last_named_step = name
-    root = Path(artifacts_dir)
+    root = workflow_artifact_root(artifacts_dir)
     if last_named_step is None:
-        return root / "preprocessed"
-    return root / "preprocessed" / task_slug(last_named_step)
+        return root / "outputs" / "preprocessed"
+    return root / "outputs" / "preprocessed" / task_slug(last_named_step)
+
+
+def workflow_artifact_root(path: str | Path) -> Path:
+    current = Path(path)
+    if current.is_file():
+        current = current.parent
+    while current.name not in {"inputs", "outputs", "reports"} and current.parent != current:
+        current = current.parent
+    if current.name in {"inputs", "outputs", "reports"}:
+        return current.parent
+    return Path(path)
 
 
 def task_slug(value: str) -> str:

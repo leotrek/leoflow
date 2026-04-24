@@ -34,23 +34,27 @@ This example includes extra fields beyond the minimal contract:
 
 That is a good reference when you want a richer workflow spec.
 
-## 3. Install dependencies and run
+## 3. Run the workflow
 
 ```bash
-cd iberia-demo
-pip install -r requirements.txt
-python app.py
+lf run ./iberia-demo
+```
+
+If you want LeoFlow to create a local virtualenv and install dependencies first:
+
+```bash
+lf run ./iberia-demo --setup
 ```
 
 ## 4. Inspect outputs
 
 Look under:
 
-- `artifacts/iberia-demo/data/`
-- `artifacts/iberia-demo/preprocessed/`
-- `artifacts/iberia-demo/features/`
-- `artifacts/iberia-demo/evaluation/`
-- `artifacts/iberia-demo/last-run.json`
+- `artifacts/iberia-demo/inputs/data/`
+- `artifacts/iberia-demo/outputs/preprocessed/`
+- `artifacts/iberia-demo/outputs/features/`
+- `artifacts/iberia-demo/outputs/evaluation/`
+- `artifacts/iberia-demo/reports/last-run.json`
 
 Typical interesting files:
 

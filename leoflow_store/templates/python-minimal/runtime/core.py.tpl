@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import urllib.parse
@@ -44,6 +45,9 @@ class WorkflowApp:
         self.project_root = Path(project_root)
         self.slug = _workflow_slug(spec)
         self.artifacts_dir = self.project_root / "artifacts" / self.slug
+        self.inputs_dir = self.artifacts_dir / "inputs"
+        self.outputs_dir = self.artifacts_dir / "outputs"
+        self.reports_dir = self.artifacts_dir / "reports"
         self._overrides: dict[str, StageHandler] = {}
 
     def step(self, name: str) -> Callable[[StageHandler], StageHandler]:
@@ -57,6 +61,7 @@ class WorkflowApp:
         return decorator
 
     def run(self) -> dict[str, Any]:
+        self._migrate_legacy_artifacts()
         context: dict[str, Any] = {"spec": self.spec}
         context["data"] = self._call_stage("load_data", context)
         context["preprocessing"] = self._call_stage("preprocess", context)
@@ -65,8 +70,13 @@ class WorkflowApp:
         context["evaluation"] = self._call_stage("evaluate", context)
         result = self._call_stage("build_output", context)
 
-        self.artifacts_dir.mkdir(parents=True, exist_ok=True)
-        report_path = self.artifacts_dir / "last-run.json"
+        self.reports_dir.mkdir(parents=True, exist_ok=True)
+        report_path = self.reports_dir / "last-run.json"
+        io_manifest_path = self.reports_dir / "io-manifest.json"
+        if isinstance(result, dict):
+            result = self._finalize_result(result, context, report_path, io_manifest_path)
+            io_manifest = self._build_io_manifest(result, io_manifest_path)
+            io_manifest_path.write_text(json.dumps(io_manifest, indent=2) + "\n", encoding="utf-8")
         report_path.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
         print(json.dumps(result, indent=2))
         return result
@@ -90,6 +100,45 @@ class WorkflowApp:
             result.setdefault("duration_seconds", timing["duration_seconds"])
         return result
 
+    def _migrate_legacy_artifacts(self) -> None:
+        if not self.artifacts_dir.exists():
+            return
+        moves = [
+            (self.artifacts_dir / "data", self.inputs_dir / "data"),
+            (self.artifacts_dir / "models", self.inputs_dir / "models"),
+            (self.artifacts_dir / "preprocessed", self.outputs_dir / "preprocessed"),
+            (self.artifacts_dir / "features", self.outputs_dir / "features"),
+            (self.artifacts_dir / "evaluation", self.outputs_dir / "evaluation"),
+            (self.artifacts_dir / "predictions", self.outputs_dir / "predictions"),
+            (self.artifacts_dir / "last-run.json", self.reports_dir / "last-run.json"),
+            (self.artifacts_dir / "io-manifest.json", self.reports_dir / "io-manifest.json"),
+            (self.artifacts_dir / "evaluation.json", self.outputs_dir / "evaluation" / "evaluation.json"),
+        ]
+        output_name = str(self.spec["model"]["output"])
+        moves.extend(
+            [
+                (self.artifacts_dir / f"{output_name}.json", self.outputs_dir / "predictions" / f"{output_name}.json"),
+                (self.artifacts_dir / f"{output_name}.tif", self.outputs_dir / "predictions" / f"{output_name}.tif"),
+                (self.artifacts_dir / f"{output_name}.npy", self.outputs_dir / "predictions" / f"{output_name}.npy"),
+                (self.artifacts_dir / f"{output_name}.onnx", self.outputs_dir / "predictions" / f"{output_name}.onnx"),
+                (
+                    self.artifacts_dir / f"{output_name}_preview.png",
+                    self.outputs_dir / "predictions" / f"{output_name}_preview.png",
+                ),
+                (self.artifacts_dir / "predictions.pt", self.outputs_dir / "predictions.pt"),
+                (self.artifacts_dir / "model.pt", self.outputs_dir / "model.pt"),
+                (self.artifacts_dir / "eopatch", self.outputs_dir / "eopatch"),
+            ]
+        )
+        for source, target in moves:
+            self._move_legacy_path(source, target)
+
+    def _move_legacy_path(self, source: Path, target: Path) -> None:
+        if not source.exists() or target.exists():
+            return
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(source), str(target))
+
     def default_load_data(self, context: dict[str, Any]) -> dict[str, Any]:
         source = self.spec["data"]["source"]
         if isinstance(source, str):
@@ -99,7 +148,7 @@ class WorkflowApp:
                     "data",
                     task_name,
                     {
-                        "--output-dir": self.artifacts_dir / "data" / "raw",
+                        "--output-dir": self.inputs_dir / "data" / "raw",
                     },
                 )
 
@@ -119,7 +168,7 @@ class WorkflowApp:
         executed_commands: list[dict[str, Any]] = []
         executed_tasks: list[dict[str, Any]] = []
         declared_steps: list[str] = []
-        current_input = context["data"].get("data_dir") or str(self.artifacts_dir / "data" / "raw")
+        current_input = context["data"].get("data_dir") or str(self.inputs_dir / "data" / "raw")
 
         for step in self.spec["preprocessing"]:
             name, value = next(iter(step.items()))
@@ -133,7 +182,7 @@ class WorkflowApp:
             task_name = _task_slug(name)
             declared_steps.append(f"{name}:{value}")
             if self._task_exists("preprocessing", task_name):
-                output_dir = self.artifacts_dir / "preprocessed" / task_name
+                output_dir = self.outputs_dir / "preprocessed" / task_name
                 task_result = self._run_task_module(
                     "preprocessing",
                     task_name,
@@ -150,13 +199,13 @@ class WorkflowApp:
             "commands": executed_commands,
             "tasks": executed_tasks,
             "input_source": context["data"]["source"],
-            "output_dir": current_input or str(self.artifacts_dir / "preprocessed"),
+            "output_dir": current_input or str(self.outputs_dir / "preprocessed"),
             "status": "prepared",
         }
 
     def default_extract_features(self, context: dict[str, Any]) -> dict[str, Any]:
         input_dir = context["preprocessing"].get("output_dir") or context["data"].get("data_dir")
-        output_dir = self.artifacts_dir / "features"
+        output_dir = self.outputs_dir / "features"
         executed_tasks: list[dict[str, Any]] = []
         output_files: list[str] = []
 
@@ -192,7 +241,11 @@ class WorkflowApp:
         executor = self.spec["model"].get("executor")
         if executor:
             command_result = self._execute_command(executor, context, {"model_path": model_path})
-            artifact = command_result.get("artifact") if command_result else str(self.artifacts_dir / f"{self.spec['model']['output']}.tif")
+            artifact = (
+                command_result.get("artifact")
+                if command_result
+                else str(self.outputs_dir / "predictions" / f"{self.spec['model']['output']}.tif")
+            )
             return {
                 "type": self.spec["model"]["type"],
                 "input": self.spec["model"]["input"],
@@ -205,7 +258,7 @@ class WorkflowApp:
 
         task_name = _task_slug(self.spec["model"]["output"])
         if self._task_exists("model", task_name):
-            output_path = self.artifacts_dir / f"{task_name}.json"
+            output_path = self.outputs_dir / "predictions" / f"{task_name}.json"
             task_result = self._run_task_module(
                 "model",
                 task_name,
@@ -244,7 +297,7 @@ class WorkflowApp:
         for metric_name in self.spec["evaluation"]["metrics"]:
             task_name = _task_slug(metric_name)
             if self._task_exists("evaluation", task_name):
-                output_path = self.artifacts_dir / "evaluation" / f"{task_name}.json"
+                output_path = self.outputs_dir / "evaluation" / f"{task_name}.json"
                 task_results.append(
                     self._run_task_module(
                         "evaluation",
@@ -271,7 +324,11 @@ class WorkflowApp:
 
     def default_build_output(self, context: dict[str, Any]) -> dict[str, Any]:
         artifacts = {
-            "run_report": str(self.artifacts_dir / "last-run.json"),
+            "artifact_root": str(self.artifacts_dir),
+            "inputs_root": str(self.inputs_dir),
+            "output_root": str(self.outputs_dir),
+            "reports_root": str(self.reports_dir),
+            "run_report": str(self.reports_dir / "last-run.json"),
             "prediction_artifact": context["prediction"].get("artifact"),
         }
         if context["evaluation"].get("tasks"):
@@ -287,6 +344,148 @@ class WorkflowApp:
             "evaluation": context["evaluation"],
             "artifacts": artifacts,
         }
+
+    def _finalize_result(
+        self,
+        result: dict[str, Any],
+        context: dict[str, Any],
+        report_path: Path,
+        io_manifest_path: Path,
+    ) -> dict[str, Any]:
+        finalized = dict(result)
+        inputs = self._inputs_summary(context)
+        outputs = self._outputs_summary(context)
+        reports = self._reports_summary(report_path, io_manifest_path)
+        artifacts = finalized.get("artifacts")
+        if isinstance(artifacts, dict):
+            artifacts.setdefault("artifact_root", str(self.artifacts_dir))
+            artifacts.setdefault("inputs_root", str(self.inputs_dir))
+            artifacts.setdefault("output_root", str(self.outputs_dir))
+            artifacts.setdefault("reports_root", str(self.reports_dir))
+            artifacts.setdefault("run_report", str(report_path))
+            artifacts["io_manifest"] = str(io_manifest_path)
+        else:
+            finalized["artifacts"] = {
+                "artifact_root": str(self.artifacts_dir),
+                "inputs_root": str(self.inputs_dir),
+                "output_root": str(self.outputs_dir),
+                "reports_root": str(self.reports_dir),
+                "run_report": str(report_path),
+                "io_manifest": str(io_manifest_path),
+            }
+        finalized["inputs"] = inputs
+        finalized["outputs"] = outputs
+        finalized["reports"] = reports
+        finalized["workflow_inputs"] = inputs
+        finalized["output_files"] = outputs["files"]
+        return finalized
+
+    def _build_io_manifest(self, result: dict[str, Any], io_manifest_path: Path) -> dict[str, Any]:
+        return {
+            "workflow": self.spec["workflow"]["name"],
+            "runtime": self.runtime_name,
+            "manifest_path": str(io_manifest_path),
+            "inputs": result["inputs"],
+            "outputs": result["outputs"],
+            "reports": result["reports"],
+        }
+
+    def _inputs_summary(self, context: dict[str, Any]) -> dict[str, Any]:
+        local_files = self._input_files()
+        raw_data_files = self._collect_existing_files(context.get("data", {}).get("downloaded_assets"))
+        model_files = self._collect_existing_files(context.get("prediction", {}).get("model_path"))
+        return {
+            "input_root": str(self.inputs_dir.resolve()),
+            "workflow_yaml": str((self.project_root / "workflow.yaml").resolve()),
+            "data": {
+                "source": self.spec["data"]["source"],
+                "region": self.spec["data"]["region"],
+                "time_range": self.spec["data"]["time"],
+                "resolution": self.spec["data"]["resolution"],
+            },
+            "local_files": local_files,
+            "raw_data_files": raw_data_files,
+            "model_files": model_files,
+            "all_files": sorted({*local_files, *raw_data_files, *model_files}),
+        }
+
+    def _input_files(self) -> list[str]:
+        files = {str((self.project_root / "workflow.yaml").resolve())}
+        stack: list[Any] = [self.spec]
+        while stack:
+            value = stack.pop()
+            if isinstance(value, dict):
+                stack.extend(value.values())
+                continue
+            if isinstance(value, list):
+                stack.extend(value)
+                continue
+            if isinstance(value, str):
+                resolved = self._resolve_local_input_file(value)
+                if resolved:
+                    files.add(str(resolved.resolve()))
+        return sorted(files)
+
+    def _resolve_local_input_file(self, value: str) -> Path | None:
+        if not value or "://" in value or "{" in value or "}" in value or "\n" in value:
+            return None
+        candidate = Path(value).expanduser()
+        if candidate.is_absolute():
+            return candidate if candidate.exists() and candidate.is_file() else None
+        resolved = self.project_root / candidate
+        return resolved if resolved.exists() and resolved.is_file() else None
+
+    def _outputs_summary(self, context: dict[str, Any]) -> dict[str, Any]:
+        files = {str(path.resolve()) for path in self.outputs_dir.rglob("*") if path.is_file()}
+        primary_files = set(self._collect_existing_files(context.get("prediction", {}).get("artifact")))
+        primary_files.update(self._collect_existing_files(context.get("evaluation", {}).get("artifact")))
+        primary_files.update(self._collect_existing_files(context.get("evaluation", {}).get("prediction")))
+        primary_files.update(self._collect_existing_files(self._evaluation_artifact_candidates(context)))
+        return {
+            "output_root": str(self.outputs_dir.resolve()),
+            "primary_files": sorted(primary_files),
+            "files": sorted(files),
+        }
+
+    def _reports_summary(self, report_path: Path, io_manifest_path: Path) -> dict[str, Any]:
+        return {
+            "report_root": str(self.reports_dir.resolve()),
+            "files": sorted([str(report_path.resolve()), str(io_manifest_path.resolve())]),
+        }
+
+    def _evaluation_artifact_candidates(self, context: dict[str, Any]) -> list[Any]:
+        evaluation = context.get("evaluation", {})
+        values: list[Any] = []
+        if isinstance(evaluation, dict):
+            if isinstance(evaluation.get("tasks"), list):
+                for task in evaluation["tasks"]:
+                    if isinstance(task, dict):
+                        values.append(task.get("artifact"))
+            executor = evaluation.get("executor")
+            if isinstance(executor, dict):
+                values.append(executor.get("artifact"))
+        return values
+
+    def _collect_existing_files(self, value: Any) -> list[str]:
+        files: set[str] = set()
+        stack: list[Any] = [value]
+        while stack:
+            current = stack.pop()
+            if isinstance(current, dict):
+                stack.extend(current.values())
+                continue
+            if isinstance(current, (list, tuple, set)):
+                stack.extend(current)
+                continue
+            if isinstance(current, Path):
+                path = current
+            elif isinstance(current, str):
+                path = Path(current)
+            else:
+                continue
+            if path.exists() and path.is_file():
+                files.add(str(path.resolve()))
+        return sorted(files)
 
     def _preprocessing_steps(self) -> list[str]:
         steps: list[str] = []
@@ -325,7 +524,7 @@ class WorkflowApp:
         return payload
 
     def _download_stac_source(self, source: dict[str, Any]) -> dict[str, Any]:
-        data_dir = self.artifacts_dir / "data"
+        data_dir = self.inputs_dir / "data"
         raw_dir = data_dir / "raw"
         raw_dir.mkdir(parents=True, exist_ok=True)
 
@@ -382,7 +581,7 @@ class WorkflowApp:
 
     def _download_url_source(self, source: dict[str, Any]) -> dict[str, Any]:
         url = source["url"]
-        data_dir = self.artifacts_dir / "data"
+        data_dir = self.inputs_dir / "data"
         data_dir.mkdir(parents=True, exist_ok=True)
         output_path = data_dir / self._asset_filename(source.get("filename", "source"), url)
         self._download_file(url, output_path, headers=source.get("headers"))
@@ -398,7 +597,7 @@ class WorkflowApp:
 
     def _resolve_model_source(self, source: dict[str, Any]) -> str | None:
         kind = source.get("kind", "").lower()
-        model_dir = self.artifacts_dir / "models"
+        model_dir = self.inputs_dir / "models"
         model_dir.mkdir(parents=True, exist_ok=True)
 
         if kind == "huggingface":
@@ -505,12 +704,15 @@ class WorkflowApp:
         return duration
 
     def _command_context(self, context: dict[str, Any], extra_context: dict[str, Any]) -> dict[str, str]:
-        data_dir = context.get("data", {}).get("data_dir") or str(self.artifacts_dir / "data")
-        preprocess_dir = context.get("preprocessing", {}).get("output_dir") or str(self.artifacts_dir / "preprocessed")
-        prediction_dir = str(self.artifacts_dir / "predictions")
+        data_dir = context.get("data", {}).get("data_dir") or str(self.inputs_dir / "data" / "raw")
+        preprocess_dir = context.get("preprocessing", {}).get("output_dir") or str(self.outputs_dir / "preprocessed")
+        prediction_dir = str(self.outputs_dir / "predictions")
         values = {
             "workflow_dir": str(self.project_root),
             "artifacts_dir": str(self.artifacts_dir),
+            "inputs_dir": str(self.inputs_dir),
+            "outputs_dir": str(self.outputs_dir),
+            "reports_dir": str(self.reports_dir),
             "data_dir": data_dir,
             "preprocess_dir": preprocess_dir,
             "prediction_dir": prediction_dir,

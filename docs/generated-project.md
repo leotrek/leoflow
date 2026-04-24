@@ -28,6 +28,10 @@ my-workflow/
   tests/
     test_workflow.py
   artifacts/
+    my-workflow/
+      inputs/
+      outputs/
+      reports/
 ```
 
 The exact contents vary by runtime template and workflow, but this is the stable shape for `python-minimal`.
@@ -95,7 +99,13 @@ You normally edit this only when working on LeoFlow itself or when designing a n
 For most generated projects, you run:
 
 ```bash
-python app.py
+lf run .
+```
+
+If you want LeoFlow to create or refresh a project-local virtualenv first:
+
+```bash
+lf run . --setup
 ```
 
 You usually leave `app.py` alone unless you need custom stage overrides or entrypoint behavior.
@@ -135,23 +145,28 @@ The purpose of these helpers is to keep task files focused on workflow logic ins
 
 ## Outputs And Artifacts
 
-Workflow runs write outputs under `artifacts/<workflow-slug>/`.
+Workflow runs write artifacts under `artifacts/<workflow-slug>/`.
 
-Typical outputs:
+Typical layout:
 
-- downloaded data
-- preprocessed rasters
-- derived features
-- model outputs
-- evaluation reports
-- `last-run.json`
+- `inputs/`: downloaded raw data, downloaded model files, and other runtime materialized inputs
+- `outputs/`: preprocessed rasters, derived features, predictions, and evaluation reports
+- `reports/`: `last-run.json` and `io-manifest.json`
 
 Example wildfire outputs:
 
-- `artifacts/wildfire-detection/preprocessed/cloud_mask/true_color.png`
-- `artifacts/wildfire-detection/fire_mask.tif`
-- `artifacts/wildfire-detection/fire_mask_preview.png`
-- `artifacts/wildfire-detection/last-run.json`
+- `artifacts/wildfire-detection/outputs/preprocessed/cloud_mask/true_color.png`
+- `artifacts/wildfire-detection/outputs/predictions/fire_mask.tif`
+- `artifacts/wildfire-detection/outputs/predictions/fire_mask_preview.png`
+- `artifacts/wildfire-detection/reports/last-run.json`
+
+The `reports/last-run.json` report includes:
+
+- `inputs`: declared workflow inputs, local config/resources, and materialized runtime inputs such as downloaded raw data
+- `outputs`: produced files under `artifacts/<workflow-slug>/outputs/`, separated from runtime inputs so you can reason about downlink candidates
+- `reports`: generated report files under `artifacts/<workflow-slug>/reports/`
+
+LeoFlow also writes `artifacts/<workflow-slug>/reports/io-manifest.json` with the same input/output summary.
 
 ## Editable Boundary Summary
 

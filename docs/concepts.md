@@ -35,6 +35,7 @@ These are used by:
 
 - `lf create --runtime-template ...`
 - `lf build --template ...`
+- `lf run --template ...` when running from a raw workflow spec
 - `lf test --template ...` when testing from a raw workflow spec
 - `python -m leoflow_store.api.generate --template ...`
 
@@ -71,7 +72,7 @@ It usually contains:
 - `README.md`
 - `requirements.txt`
 
-This is what you run with `python app.py`.
+This is what you run with `lf run .`.
 
 ## Registry Bundle
 
@@ -100,7 +101,7 @@ Most users follow one of these flows.
 2. choose an example workflow template
 3. run `lf create <name> <output> --template <example-name>`
 4. edit `workflow.yaml`, `tasks/`, and `resources/`
-5. run `python app.py`
+5. run `lf run <output>` or `lf run <output> --setup`
 
 ### Flow 2: start from your own workflow spec
 
@@ -108,7 +109,7 @@ Most users follow one of these flows.
 2. run `lf build <workflow-dir-or-yaml> --output <build-dir>`
 3. inspect the generated project
 4. run `lf test <build-dir>`
-5. run `python <build-dir>/app.py`
+5. run `lf run <build-dir>` or `lf run <build-dir> --setup`
 
 ### Flow 3: publish and reuse a bundle
 

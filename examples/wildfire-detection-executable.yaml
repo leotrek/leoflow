@@ -50,5 +50,5 @@ evaluation:
     - iou
     - temporal_consistency
   executor:
-    run: python3 tasks/custom/evaluate.py --predictions "{prediction_dir}" --report "{artifacts_dir}/evaluation.json"
-    artifact: "{artifacts_dir}/evaluation.json"
+    run: python3 tasks/custom/evaluate.py --predictions "{prediction_dir}" --report "{outputs_dir}/evaluation/evaluation.json"
+    artifact: "{outputs_dir}/evaluation/evaluation.json"

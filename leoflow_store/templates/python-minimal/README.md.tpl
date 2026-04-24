@@ -28,11 +28,17 @@ Files:
 Run:
 
 ```bash
-pip install -r requirements.txt
-python3 app.py
+lf run .
 ```
 
-This bundle always writes its run report to `artifacts/{{WORKFLOW_SLUG}}/last-run.json`.
+If you want LeoFlow to create or refresh a local virtualenv before running:
+
+```bash
+lf run . --setup
+```
+
+This bundle writes runtime artifacts under `artifacts/{{WORKFLOW_SLUG}}/inputs/`, `artifacts/{{WORKFLOW_SLUG}}/outputs/`, and `artifacts/{{WORKFLOW_SLUG}}/reports/`.
+The run report includes `inputs`, `outputs`, and `reports`, and LeoFlow also writes `artifacts/{{WORKFLOW_SLUG}}/reports/io-manifest.json`.
 Whether it executes real EO work depends on the task implementations and workflow config:
 
 - generated preprocessing and feature tasks are lightweight scaffolds

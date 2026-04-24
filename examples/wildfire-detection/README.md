@@ -25,19 +25,26 @@ Usually leave these alone:
 Run:
 
 ```bash
-pip install -r requirements.txt
-python3 app.py
+lf run examples/wildfire-detection
+```
+
+To let LeoFlow create a project-local virtualenv and install dependencies first:
+
+```bash
+lf run examples/wildfire-detection --setup
 ```
 
 This example downloads real Sentinel-2 assets, runs the generated preprocessing and feature steps, and writes outputs under `artifacts/wildfire-detection/`.
+The artifact layout is split into `inputs/`, `outputs/`, and `reports/`.
+`artifacts/wildfire-detection/reports/last-run.json` includes `inputs`, `outputs`, and `reports`, and `artifacts/wildfire-detection/reports/io-manifest.json` gives the same execution I/O summary in a dedicated file. Raw downloaded data is listed as input, while derived artifacts stay under output.
 Task files are intentionally thin: the single `@task(...)` decorator in `runtime/task_runtime.py` supplies `workflow.yaml`, path arguments, result serialization, and generic helpers like `ctx.artifact_path(...)` and `ctx.write_json(...)` so each task file focuses on EO logic. Reusable task helpers live under `tasks/lib/`. The STAC task reads provider settings from `workflow.yaml`, and the AOI for the query comes from `resources/polygon.geojson`.
 
 Useful outputs:
 
-- `artifacts/wildfire-detection/preprocessed/cloud_mask/true_color.png`
-- `artifacts/wildfire-detection/fire_mask_preview.png`
-- `artifacts/wildfire-detection/fire_mask.tif`
-- `artifacts/wildfire-detection/last-run.json`
+- `artifacts/wildfire-detection/outputs/preprocessed/cloud_mask/true_color.png`
+- `artifacts/wildfire-detection/outputs/predictions/fire_mask_preview.png`
+- `artifacts/wildfire-detection/outputs/predictions/fire_mask.tif`
+- `artifacts/wildfire-detection/reports/last-run.json`
 
 Notes:
 

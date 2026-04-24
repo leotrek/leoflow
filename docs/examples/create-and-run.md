@@ -32,20 +32,19 @@ Important files:
 - `wildfire-demo/resources/polygon.geojson`
 - `wildfire-demo/tests/test_workflow.py`
 
-## 4. Install dependencies
+## 4. Run the workflow
 
 ```bash
-cd wildfire-demo
-pip install -r requirements.txt
+lf run ./wildfire-demo
 ```
 
-## 5. Run the workflow
+If you want LeoFlow to create a local virtualenv and install dependencies first:
 
 ```bash
-python app.py
+lf run ./wildfire-demo --setup
 ```
 
-## 6. Inspect outputs
+## 5. Inspect outputs
 
 Look under:
 
@@ -53,12 +52,20 @@ Look under:
 
 Typical outputs include:
 
-- `last-run.json`
-- previews under preprocessing artifacts
-- feature rasters
-- model output artifacts
+- `outputs/preprocessed/`
+- `outputs/features/`
+- `outputs/predictions/`
+- `reports/last-run.json`
 
-## 7. Customize the workflow
+Inside `last-run.json`, LeoFlow now writes:
+
+- `inputs` for the workflow config, local resources, and runtime input data
+- `outputs` for the files created by the run
+- `reports` for generated report files
+
+LeoFlow also writes `artifacts/<workflow-slug>/reports/io-manifest.json`.
+
+## 6. Customize the workflow
 
 Common edits:
 
@@ -66,7 +73,7 @@ Common edits:
 - edit `tasks/` to change the business logic
 - edit `resources/polygon.geojson` to change the AOI
 
-## 8. Run the generated tests
+## 7. Run the generated tests
 
 ```bash
 python -m unittest discover -s tests -p 'test_*.py'

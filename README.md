@@ -8,10 +8,28 @@ It lets you:
 
 - create a workflow project from an example template
 - build runnable code from a `workflow.yaml`
+- run generated workflows and examples from the CLI
 - test generated workflows
 - publish and download versioned bundles from a local registry
 
 Detailed documentation lives under [docs/index.md](/Users/kenia/workspace/leoflow/docs/index.md#L1). A browsable docs site is configured in [mkdocs.yml](/Users/kenia/workspace/leoflow/mkdocs.yml#L1).
+
+## Read The Docs
+
+Choose one of these entry points:
+
+- hosted docs: `https://leoflow-store.readthedocs.io`
+- repo docs index: [docs/index.md](/Users/kenia/workspace/leoflow/docs/index.md#L1)
+- CLI reference: [docs/cli.md](/Users/kenia/workspace/leoflow/docs/cli.md#L1)
+
+Serve the docs locally with MkDocs:
+
+```bash
+python -m pip install mkdocs
+mkdocs serve
+```
+
+Then open the local URL printed by MkDocs.
 
 ## Install
 
@@ -52,22 +70,32 @@ lf create wildfire-demo ./wildfire-demo --template wildfire-detection
 Run the generated project:
 
 ```bash
-cd wildfire-demo
-pip install -r requirements.txt
-python app.py
+lf run ./wildfire-demo
+```
+
+The generated run reports live under `artifacts/<workflow-slug>/reports/`: `last-run.json` includes `inputs`, `outputs`, and `reports`, and LeoFlow also writes `io-manifest.json` there.
+
+If you want LeoFlow to create a project-local virtualenv and install requirements first:
+
+```bash
+lf run ./wildfire-demo --setup
 ```
 
 Run the example project:
 
 ```bash
-cd examples/wildfire-detection
-
-python3 -m venv .venv
-source .venv/bin/activate
-
-pip install -r requirements.txt
-python app.py
+lf run examples/wildfire-detection --setup
 ```
+
+## How To Run
+
+Common run flows:
+
+- run a checked-in example with env setup: `lf run examples/wildfire-detection --setup`
+- run a generated project with env setup: `lf run ./wildfire-demo --setup`
+- run a generated project with the current interpreter: `lf run ./wildfire-demo`
+- run directly from a workflow spec: `lf run examples/wildfire-detection/workflow.yaml`
+- generate a reusable build and run it: `lf run examples/wildfire-detection --keep-build`
 
 
 Build from an existing workflow spec:
@@ -87,6 +115,7 @@ lf test build/wildfire-detection
 - `lf create`: create a new project from an example workflow template
 - `lf list`: list example workflow templates, or registry entries with `--registry`
 - `lf build`: generate a runnable project from a workflow spec
+- `lf run`: run a generated project directly or generate-and-run from a workflow spec
 - `lf test`: run tests for a generated project or generate-and-test from a workflow spec
 - `lf delete`: delete a generated project directory or a registry entry
 - `lf help`: show command help
@@ -97,17 +126,6 @@ lf test build/wildfire-detection
 - [leoflow_store/](/Users/kenia/workspace/leoflow/leoflow_store): CLI, generator, registry, and runtime template code
 - [registry/](/Users/kenia/workspace/leoflow/registry): local published bundles
 - [docs/](/Users/kenia/workspace/leoflow/docs): full documentation
-
-## Read The Docs Style Docs
-
-Serve the docs locally with MkDocs:
-
-```bash
-python -m pip install mkdocs
-mkdocs serve
-```
-
-Then open the local URL shown by MkDocs.
 
 ## Where To Read More
 

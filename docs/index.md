@@ -9,6 +9,23 @@ It has four main jobs:
 3. package generated projects into a local registry
 4. download and reuse published workflow bundles
 
+## Start Here
+
+If you are new to the repo, read in this order:
+
+1. [CLI](cli.md): the commands you actually run
+2. [Generated Project](generated-project.md): what LeoFlow creates and what you should edit
+3. [Examples](examples/create-and-run.md): end-to-end walkthrough starting from a built-in workflow
+
+If you prefer a browsable site instead of Markdown files in the repo:
+
+```bash
+python -m pip install mkdocs
+mkdocs serve
+```
+
+Then open the local URL printed by MkDocs.
+
 ## What LeoFlow manages
 
 LeoFlow has a few distinct layers:
@@ -48,9 +65,13 @@ lf create wildfire-demo ./wildfire-demo --template wildfire-detection
 Run the generated project:
 
 ```bash
-cd wildfire-demo
-pip install -r requirements.txt
-python app.py
+lf run ./wildfire-demo
+```
+
+Or let LeoFlow create a local virtualenv and install dependencies first:
+
+```bash
+lf run ./wildfire-demo --setup
 ```
 
 Build code from an existing `workflow.yaml`:
@@ -65,6 +86,18 @@ Run tests for a generated project:
 lf test build/wildfire-detection
 ```
 
+Run a checked-in example directly:
+
+```bash
+lf run examples/wildfire-detection --setup
+```
+
+Run directly from a workflow spec without a separate build step:
+
+```bash
+lf run examples/wildfire-detection/workflow.yaml
+```
+
 ## Documentation Map
 
 - [Concepts](concepts.md): store model and object lifecycle
@@ -74,15 +107,6 @@ lf test build/wildfire-detection
 - [Registry](registry.md): registry structure, metadata, publish, search, and download
 - [Examples](examples/create-and-run.md): step-by-step walkthroughs
 
-## Serve These Docs Locally
+## Hosted Docs
 
-This repo includes an `mkdocs.yml` configured with the Read the Docs theme.
-
-If you want a browsable docs site locally:
-
-```bash
-python -m pip install mkdocs
-mkdocs serve
-```
-
-Then open the local MkDocs server shown in the terminal.
+The hosted docs entry point is `https://leoflow-store.readthedocs.io`.

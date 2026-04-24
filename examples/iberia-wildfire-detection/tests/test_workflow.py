@@ -191,7 +191,16 @@ class GeneratedWorkflowTest(unittest.TestCase):
         self.assertEqual(payload["workflow"], "iberia-wildfire-detection")
         self.assertEqual(payload["runtime"], "python-minimal")
         self.assertEqual(payload["status"], "completed")
-        self.assertTrue((ROOT / "artifacts" / "iberia-wildfire-detection" / "last-run.json").exists())
+        self.assertTrue((ROOT / "artifacts" / "iberia-wildfire-detection" / "reports" / "last-run.json").exists())
+        self.assertTrue((ROOT / "artifacts" / "iberia-wildfire-detection" / "reports" / "io-manifest.json").exists())
+        self.assertEqual(
+            Path(payload["inputs"]["workflow_yaml"]).resolve(),
+            (ROOT / "workflow.yaml").resolve(),
+        )
+        self.assertIn(
+            str((ROOT / "artifacts" / "iberia-wildfire-detection" / "reports" / "last-run.json").resolve()),
+            payload["reports"]["files"],
+        )
         self.assertTrue(Path(payload["prediction"]["artifact"]).exists())
 
     def _run_module(self, module: str, workflow_path: Path, *args: object) -> dict:

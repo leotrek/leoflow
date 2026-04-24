@@ -63,8 +63,8 @@ class ExecutableRuntimeTest(unittest.TestCase):
                     "evaluation": {
                         "metrics": ["iou"],
                         "executor": {
-                            "run": 'mkdir -p "{artifacts_dir}" && printf "iou ok\\n" > "{artifacts_dir}/evaluation.json"',
-                            "artifact": "{artifacts_dir}/evaluation.json",
+                            "run": 'mkdir -p "{outputs_dir}/evaluation" && printf "iou ok\\n" > "{outputs_dir}/evaluation/evaluation.json"',
+                            "artifact": "{outputs_dir}/evaluation/evaluation.json",
                         },
                     },
                 }
@@ -91,11 +91,56 @@ class ExecutableRuntimeTest(unittest.TestCase):
             self.assertIn("[finish] task features/ndvi", result.stderr)
             self.assertIn("duration=", result.stderr)
             self.assertTrue((project_dir / "workflow.yaml").exists())
+            self.assertEqual(
+                Path(payload["inputs"]["workflow_yaml"]).resolve(),
+                (project_dir / "workflow.yaml").resolve(),
+            )
+            self.assertEqual(
+                payload["inputs"]["data"]["source"]["collection"],
+                "sentinel-2-l2a",
+            )
+            self.assertIn(
+                str((project_dir / "resources" / "polygon.geojson").resolve()),
+                payload["inputs"]["local_files"],
+            )
+            self.assertIn(
+                str((fixture / "search-results.json").resolve()),
+                payload["inputs"]["local_files"],
+            )
+            self.assertIn(
+                str(
+                    (
+                        project_dir
+                        / "artifacts"
+                        / "wildfire-download-runner"
+                        / "inputs"
+                        / "data"
+                        / "raw"
+                        / "item-1"
+                        / "B04.tif"
+                    ).resolve()
+                ),
+                payload["inputs"]["raw_data_files"],
+            )
+            self.assertIn(
+                str(
+                    (
+                        project_dir
+                        / "artifacts"
+                        / "wildfire-download-runner"
+                        / "inputs"
+                        / "models"
+                        / "model.onnx"
+                    ).resolve()
+                ),
+                payload["inputs"]["model_files"],
+            )
             self.assertTrue(
                 (
                     project_dir
                     / "artifacts"
                     / "wildfire-download-runner"
+                    / "inputs"
                     / "data"
                     / "raw"
                     / "item-1"
@@ -107,6 +152,7 @@ class ExecutableRuntimeTest(unittest.TestCase):
                     project_dir
                     / "artifacts"
                     / "wildfire-download-runner"
+                    / "inputs"
                     / "models"
                     / "model.onnx"
                 ).exists()
@@ -116,6 +162,7 @@ class ExecutableRuntimeTest(unittest.TestCase):
                     project_dir
                     / "artifacts"
                     / "wildfire-download-runner"
+                    / "outputs"
                     / "preprocessed"
                     / "B04.tif"
                 ).exists()
@@ -125,6 +172,7 @@ class ExecutableRuntimeTest(unittest.TestCase):
                     project_dir
                     / "artifacts"
                     / "wildfire-download-runner"
+                    / "outputs"
                     / "predictions"
                     / "fire_mask.onnx"
                 ).exists()
@@ -134,6 +182,8 @@ class ExecutableRuntimeTest(unittest.TestCase):
                     project_dir
                     / "artifacts"
                     / "wildfire-download-runner"
+                    / "outputs"
+                    / "evaluation"
                     / "evaluation.json"
                 ).exists()
             )
@@ -143,9 +193,97 @@ class ExecutableRuntimeTest(unittest.TestCase):
                     project_dir
                     / "artifacts"
                     / "wildfire-download-runner"
+                    / "outputs"
                     / "predictions"
                     / "fire_mask.onnx"
                 ).resolve(),
+            )
+            self.assertEqual(
+                Path(payload["reports"]["report_root"]).resolve(),
+                (
+                    project_dir
+                    / "artifacts"
+                    / "wildfire-download-runner"
+                    / "reports"
+                ).resolve(),
+            )
+            self.assertIn(
+                str(
+                    (
+                        project_dir
+                        / "artifacts"
+                        / "wildfire-download-runner"
+                        / "reports"
+                        / "io-manifest.json"
+                    ).resolve()
+                ),
+                payload["reports"]["files"],
+            )
+            self.assertIn(
+                str(
+                    (
+                        project_dir
+                        / "artifacts"
+                        / "wildfire-download-runner"
+                        / "reports"
+                        / "last-run.json"
+                    ).resolve()
+                ),
+                payload["reports"]["files"],
+            )
+            self.assertIn(
+                str(
+                    (
+                        project_dir
+                        / "artifacts"
+                        / "wildfire-download-runner"
+                        / "outputs"
+                        / "evaluation"
+                        / "evaluation.json"
+                    ).resolve()
+                ),
+                payload["outputs"]["primary_files"],
+            )
+            self.assertIn(
+                str(
+                    (
+                        project_dir
+                        / "artifacts"
+                        / "wildfire-download-runner"
+                        / "outputs"
+                        / "predictions"
+                        / "fire_mask.onnx"
+                    ).resolve()
+                ),
+                payload["outputs"]["primary_files"],
+            )
+            self.assertNotIn(
+                str(
+                    (
+                        project_dir
+                        / "artifacts"
+                        / "wildfire-download-runner"
+                        / "inputs"
+                        / "data"
+                        / "raw"
+                        / "item-1"
+                        / "B04.tif"
+                    ).resolve()
+                ),
+                payload["outputs"]["files"],
+            )
+            self.assertNotIn(
+                str(
+                    (
+                        project_dir
+                        / "artifacts"
+                        / "wildfire-download-runner"
+                        / "inputs"
+                        / "models"
+                        / "model.onnx"
+                    ).resolve()
+                ),
+                payload["outputs"]["files"],
             )
 
     def _build_fixture(self, root: Path) -> Path:
