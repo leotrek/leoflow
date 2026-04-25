@@ -62,6 +62,12 @@ Create a new project from an example template:
 lf create wildfire-demo ./wildfire-demo --template wildfire-detection
 ```
 
+Create a new project from an existing workflow spec:
+
+```bash
+lf create wildfire-demo ./wildfire-demo --workflow examples/wildfire-detection/workflow.yaml
+```
+
 Run the generated project:
 
 ```bash

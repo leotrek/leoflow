@@ -35,7 +35,10 @@ class CliSmokeTest(unittest.TestCase):
 
             list_result = self._run("list", cwd=root)
             template_names = list_result.stdout.strip().splitlines()
-            self.assertEqual(template_names, ["iberia-wildfire-detection", "wildfire-detection"])
+            self.assertEqual(
+                template_names,
+                ["iberia-wildfire-detection", "sentinel-l0-flood", "wildfire-detection"],
+            )
 
             create_result = self._run("create", "wildfire-demo", project_dir, "--template", "wildfire-detection", cwd=root)
             self.assertIn("created workflow project", create_result.stdout)
@@ -86,6 +89,7 @@ class CliSmokeTest(unittest.TestCase):
         self.assertIn("Create a workflow project in the given output directory", result.stdout)
         self.assertIn("output", result.stdout)
         self.assertIn("--template", result.stdout)
+        self.assertIn("--workflow", result.stdout)
         self.assertIn("--runtime-template", result.stdout)
         self.assertNotIn("--starter", result.stdout)
 
@@ -94,6 +98,18 @@ class CliSmokeTest(unittest.TestCase):
         self.assertIn("Run a generated workflow project directly", result.stdout)
         self.assertIn("--setup", result.stdout)
         self.assertIn("--venv-dir", result.stdout)
+
+    def test_build_generates_runtime_that_reuses_current_python_for_commands(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            workflow_dir = self._write_runnable_fixture_workflow(root / "workflow")
+            build_dir = root / "direct-build"
+
+            self._run("build", workflow_dir, "--output", build_dir, cwd=root)
+            runtime_core = (build_dir / "runtime" / "core.py").read_text(encoding="utf-8")
+
+            self.assertIn('"python_executable": shlex.quote(sys.executable)', runtime_core)
+            self.assertIn('{python_executable}', runtime_core)
 
     def test_run_generated_project_and_generate_from_spec(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -165,6 +181,25 @@ class CliSmokeTest(unittest.TestCase):
             ensure_virtualenv.assert_called_once_with(project_dir / ".venv")
             install_requirements.assert_called_once_with(project_dir, requirements_path, expected_python)
 
+    @mock.patch("leoflow_store.cli.subprocess.run")
+    def test_run_workflow_requires_setup_when_current_python_misses_requirements(self, run: mock.Mock) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_dir = Path(temp_dir)
+            (project_dir / "requirements.txt").write_text("definitely-missing-package-xyz123>=1.0\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(
+                RuntimeError,
+                "definitely-missing-package-xyz123.*Run `lf run .* --setup`",
+            ):
+                cli._run_workflow_in_dir(project_dir, setup=False, venv_dir=".venv")
+
+            run.assert_not_called()
+
+    def test_requirement_import_name_uses_known_aliases(self) -> None:
+        self.assertEqual(cli._requirement_import_name("PyYAML"), "yaml")
+        self.assertEqual(cli._requirement_import_name("opencv-python"), "cv2")
+        self.assertEqual(cli._requirement_import_name("rasterio"), "rasterio")
+
     def test_create_requires_name_and_output(self) -> None:
         result = subprocess.run(
             [*CLI, "create"],
@@ -175,6 +210,29 @@ class CliSmokeTest(unittest.TestCase):
         )
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("usage: lf create", result.stderr)
+
+    def test_create_from_workflow_yaml(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            source_workflow_dir = self._write_runnable_fixture_workflow(root / "source-workflow")
+            project_dir = root / "created-from-workflow"
+
+            create_result = self._run(
+                "create",
+                "sar-demo",
+                project_dir,
+                "--workflow",
+                source_workflow_dir / "workflow.yaml",
+                cwd=root,
+            )
+
+            self.assertIn("created workflow project", create_result.stdout)
+            self.assertTrue((project_dir / "workflow.yaml").exists())
+            self.assertTrue((project_dir / "resources" / "polygon.geojson").exists())
+            self.assertTrue((project_dir / "app.py").exists())
+            workflow_text = (project_dir / "workflow.yaml").read_text(encoding="utf-8")
+            self.assertIn("name: sar-demo", workflow_text)
+            self.assertIn("search_results_path:", workflow_text)
 
     def _run(self, *args: object, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
         return subprocess.run(

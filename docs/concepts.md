@@ -106,10 +106,11 @@ Most users follow one of these flows.
 ### Flow 2: start from your own workflow spec
 
 1. write `workflow.yaml`
-2. run `lf build <workflow-dir-or-yaml> --output <build-dir>`
-3. inspect the generated project
-4. run `lf test <build-dir>`
-5. run `lf run <build-dir>` or `lf run <build-dir> --setup`
+2. optionally run `lf create <name> <output> --workflow <workflow-dir-or-yaml>`
+3. or run `lf build <workflow-dir-or-yaml> --output <build-dir>`
+4. inspect the generated project
+5. run `lf test <build-dir>`
+6. run `lf run <build-dir>` or `lf run <build-dir> --setup`
 
 ### Flow 3: publish and reuse a bundle
 

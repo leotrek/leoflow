@@ -1,0 +1,113 @@
+# Reference URLs for this example:
+# - ASF Datapool RAW product: https://datapool.asf.alaska.edu/RAW/SC/S1C_IW_RAW__0SDV_20260425T050914_20260425T050947_007368_00EF26_F2C8.zip
+# - ASF Search API docs: https://docs.asf.alaska.edu/api/basics/
+# - ASF download/auth docs: https://docs.asf.alaska.edu/asf_search/downloading/
+# - JPL OPERA RTC-S1 docs: https://www.jpl.nasa.gov/go/opera/products/rtc-product/
+# - ASF OPERA RTC-S1 guide: https://hyp3-docs.asf.alaska.edu/guides/opera_rtc_product_guide/
+# - OPERA RTC notebook: https://github.com/OPERA-Cal-Val/OPERA_Applications/blob/main/RTC/notebooks/RTC_notebook.ipynb
+workflow:
+  name: sentinel-l0-flood
+  version: 0.1.0
+  title: Sentinel-1 flood detection from RAW or GRD backscatter
+  description: 'Command-driven workflow for direct download of a Sentinel-1C Level
+    0 RAW archive from the ASF datapool, optional reuse of override rasters or
+    an external SAR focus toolchain, automatic ASF OPERA RTC-S1 fallback when
+    no rasters are available, and flood mapping over eastern Austria with raster,
+    vector, and JSON outputs.
+
+    '
+  notebook: https://github.com/OPERA-Cal-Val/OPERA_Applications/blob/main/RTC/notebooks/RTC_notebook.ipynb
+# Stage 1: download the configured RAW archive, copy any override rasters, and if
+# needed query ASF OPERA RTC-S1 products for the same AOI/time window.
+data:
+  source: sentinel_1_asf_datapool_raw
+  provider:
+    name: ASF DAAC datapool
+    collection: SENTINEL-1C_RAW
+    auth:
+      username: username
+      password: ""
+      password_env: EARTHDATA_PASSWORD
+  acquisition:
+    platform: Sentinel-1C
+    instrument: C-SAR
+    processing_level: L0
+    beam_mode: IW
+    polarizations:
+    - VV
+    - VH
+    archive_type: RAW
+    granule_id: S1C_IW_RAW__0SDV_20260425T050914_20260425T050947_007368_00EF26_F2C8
+  download:
+    # Example ASF Datapool scene URL for this workflow.
+    url: https://datapool.asf.alaska.edu/RAW/SC/S1C_IW_RAW__0SDV_20260425T050914_20260425T050947_007368_00EF26_F2C8.zip
+    filename: S1C_IW_RAW__0SDV_20260425T050914_20260425T050947_007368_00EF26_F2C8.zip
+    auth_type: earthdata_basic
+  toolchain:
+    focus:
+      # Optional external SAR focus hook. The command must write post-event vv.tif and
+      # vh.tif into {output_dir}. You can also write local_incidence_angle.tif.
+      # If this is left empty and resources/processed-inputs does not provide rasters,
+      # LeoFlow now falls back to ASF OPERA RTC VV/VH mosaics for the same AOI/time.
+      # Example SNAP/pyroSAR wrapper entrypoint:
+      # command: '"{python_executable}" scripts/run_snap_raw_focus.py --safe "{safe_dir}" --archive "{archive_path}" --region "{region_path}" --output "{output_dir}"'
+      # env:
+      #   SNAP_GPT: /Applications/snap/bin/gpt
+      #   SNAP_RAW_GRAPH: /absolute/path/to/raw-to-vv-vh.xml
+      command: ""
+  overrides:
+    raster_dir: resources/processed-inputs
+    pre_event_dir: resources/pre-event
+  region: resources/austria-east.geojson
+  time: 2026-04-25T05:09:14Z/2026-04-25T05:09:47Z
+  resolution: 10m
+  crs: EPSG:32633
+# Stage 2: prepare post-event and optional pre-event VV/VH rasters on the AOI grid.
+preprocessing:
+- command:
+    name: focus_level0
+- command:
+    name: calibrate_and_geocode
+    output: '{outputs_dir}/preprocessed/rtc'
+- command:
+    name: speckle_filter
+    output: '{outputs_dir}/preprocessed/rtc_filtered'
+# Stage 3: expose the model inputs LeoFlow expects.
+features:
+- sigma0_vv
+- sigma0_vh
+- vv_vh_ratio
+- local_incidence_angle
+# Stage 4: threshold-based flood detection with optional pre-event change filtering,
+# connected-component cleanup, and overlay summaries.
+model:
+  type: water_detection
+  input: sigma0_vv,sigma0_vh,vv_vh_ratio,local_incidence_angle
+  output: flood_mask
+  parameters:
+    water_detection:
+      vv_threshold: 0.06
+      vh_threshold: 0.02
+      ratio_threshold: 1.25
+      change_threshold_db: -1.5
+      use_pre_event_change: true
+      default_incidence_angle_deg: 35.0
+    postprocess:
+      min_region_pixels: 25
+    resources:
+      permanent_water: resources/permanent-water.geojson
+      roads: resources/roads.geojson
+      settlements: resources/settlements.geojson
+      agriculture: resources/agriculture.geojson
+  executor:
+    name: detect_flood
+    artifact: '{prediction_dir}/flood_mask.tif'
+# Stage 5: summarize the generated flood outputs into an evaluation report.
+evaluation:
+  metrics:
+  - footprint_coverage
+  - raster_stats
+  - qa_summary
+  executor:
+    name: summarize_flood
+    artifact: '{outputs_dir}/evaluation/flood-summary.json'

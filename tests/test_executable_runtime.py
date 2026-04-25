@@ -289,6 +289,116 @@ class ExecutableRuntimeTest(unittest.TestCase):
                 payload["outputs"]["files"],
             )
 
+    def test_generated_app_expands_shorthand_commands_and_executors(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            fixture = self._build_fixture(root / "fixture")
+
+            spec = validate_workflow_spec(
+                {
+                    "workflow": {"name": "shorthand-runner"},
+                    "data": {
+                        "source": {
+                            "kind": "stac",
+                            "search_results_path": str(fixture / "search-results.json"),
+                            "collection": "sentinel-2-l2a",
+                            "assets": ["B04"],
+                            "limit": 1,
+                        },
+                        "region": "polygon.geojson",
+                        "time": "2024-06-01/2024-08-01",
+                        "resolution": "10m",
+                    },
+                    "preprocessing": [
+                        {"command": "focus_raw"},
+                        {
+                            "command": {
+                                "name": "calibrate_and_geocode",
+                                "output": "{outputs_dir}/preprocessed/rtc",
+                            }
+                        },
+                    ],
+                    "features": ["ndvi"],
+                    "model": {
+                        "type": "segmentation",
+                        "input": "patches(256x256)",
+                        "output": "fire_mask",
+                        "executor": {
+                            "name": "package_rtc_product",
+                            "artifact": "{prediction_dir}/rtc_backscatter.bin",
+                        },
+                    },
+                    "evaluation": {
+                        "metrics": ["iou"],
+                        "executor": "evaluate_rtc_product",
+                    },
+                }
+            )
+            version = resolve_version(spec)
+
+            project_dir = root / "build"
+            generate_project(spec, version, "python-minimal", project_dir)
+            self._write_custom_command_scripts(project_dir)
+
+            workflow_text = (project_dir / "workflow.yaml").read_text(encoding="utf-8")
+            self.assertIn("name: focus_raw", workflow_text)
+            self.assertIn("name: package_rtc_product", workflow_text)
+            self.assertNotIn("tasks/custom/focus_raw.py", workflow_text)
+
+            result = subprocess.run(
+                [sys.executable, "app.py"],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            payload = json.loads(result.stdout)
+
+            focus_dir = (
+                project_dir
+                / "artifacts"
+                / "shorthand-runner"
+                / "outputs"
+                / "preprocessed"
+                / "focus_raw"
+            )
+            rtc_dir = (
+                project_dir
+                / "artifacts"
+                / "shorthand-runner"
+                / "outputs"
+                / "preprocessed"
+                / "rtc"
+            )
+            prediction_path = (
+                project_dir
+                / "artifacts"
+                / "shorthand-runner"
+                / "outputs"
+                / "predictions"
+                / "rtc_backscatter.bin"
+            )
+            evaluation_path = (
+                project_dir
+                / "artifacts"
+                / "shorthand-runner"
+                / "outputs"
+                / "evaluation"
+                / "evaluate_rtc_product.json"
+            )
+
+            self.assertTrue((focus_dir / "B04.tif").exists())
+            self.assertTrue((rtc_dir / "B04.tif").exists())
+            self.assertTrue(prediction_path.exists())
+            self.assertTrue(evaluation_path.exists())
+            self.assertIn("[start] command python3 tasks/custom/focus_raw.py", result.stderr)
+            self.assertIn("[start] command python3 tasks/custom/package_rtc_product.py", result.stderr)
+            self.assertEqual(Path(payload["prediction"]["artifact"]).resolve(), prediction_path.resolve())
+            self.assertEqual(
+                Path(payload["evaluation"]["executor"]["artifact"]).resolve(),
+                evaluation_path.resolve(),
+            )
+
     def _build_fixture(self, root: Path) -> Path:
         asset_path = root / "assets" / "B04.tif"
         model_path = root / "hf" / "acme" / "fire-model" / "resolve" / "main" / "model.onnx"
@@ -309,6 +419,87 @@ class ExecutableRuntimeTest(unittest.TestCase):
         }
         (root / "search-results.json").write_text(json.dumps(search_result), encoding="utf-8")
         return root
+
+    def _write_custom_command_scripts(self, project_dir: Path) -> None:
+        custom_dir = project_dir / "tasks" / "custom"
+        custom_dir.mkdir(parents=True, exist_ok=True)
+
+        (custom_dir / "focus_raw.py").write_text(
+            """from __future__ import annotations
+
+import argparse
+import shutil
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--workflow", required=True)
+parser.add_argument("--input", required=True)
+parser.add_argument("--output", required=True)
+args = parser.parse_args()
+
+source = next(Path(args.input).rglob("B04.tif"))
+target = Path(args.output) / "B04.tif"
+target.parent.mkdir(parents=True, exist_ok=True)
+shutil.copy2(source, target)
+""",
+            encoding="utf-8",
+        )
+        (custom_dir / "calibrate_and_geocode.py").write_text(
+            """from __future__ import annotations
+
+import argparse
+import shutil
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--workflow", required=True)
+parser.add_argument("--input", required=True)
+parser.add_argument("--output", required=True)
+args = parser.parse_args()
+
+source = Path(args.input) / "B04.tif"
+target = Path(args.output) / "B04.tif"
+target.parent.mkdir(parents=True, exist_ok=True)
+shutil.copy2(source, target)
+""",
+            encoding="utf-8",
+        )
+        (custom_dir / "package_rtc_product.py").write_text(
+            """from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--workflow", required=True)
+parser.add_argument("--input", required=True)
+parser.add_argument("--output", required=True)
+args = parser.parse_args()
+
+target = Path(args.output)
+target.parent.mkdir(parents=True, exist_ok=True)
+target.write_text("rtc product\\n", encoding="utf-8")
+""",
+            encoding="utf-8",
+        )
+        (custom_dir / "evaluate_rtc_product.py").write_text(
+            """from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--workflow", required=True)
+parser.add_argument("--prediction", required=True)
+parser.add_argument("--report", required=True)
+args = parser.parse_args()
+
+target = Path(args.report)
+target.parent.mkdir(parents=True, exist_ok=True)
+target.write_text(Path(args.prediction).name + "\\n", encoding="utf-8")
+""",
+            encoding="utf-8",
+        )
 
 
 if __name__ == "__main__":

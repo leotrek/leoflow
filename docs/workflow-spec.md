@@ -183,6 +183,25 @@ In more executable specs, a preprocessing step may use a `command` mapping:
 
 That pattern is for command-driven runtimes. LeoFlow does not generate a `tasks/preprocessing/command.py` file for it.
 
+LeoFlow also supports a shorthand form for command-driven preprocessing:
+
+```yaml
+preprocessing:
+  - command: focus_level0
+  - command:
+      name: calibrate_and_geocode
+      output: "{outputs_dir}/preprocessed/rtc"
+```
+
+For command-driven runtimes such as `python-minimal`, LeoFlow expands that shorthand using these defaults:
+
+- script path: `tasks/custom/<name>.py`
+- workflow argument: `--workflow "{workflow_dir}/workflow.yaml"`
+- input argument: `--input "{input_dir}"`
+- output argument: `--output "{outputs_dir}/preprocessed/<name>"`
+
+Users can still override any part of the command by setting explicit `run`, `script`, or `output` fields.
+
 ## `features`
 
 An ordered list of feature names:
@@ -242,6 +261,31 @@ model:
     artifact: "{prediction_dir}/fire_mask.tif"
 ```
 
+LeoFlow also supports a shorthand executor:
+
+```yaml
+model:
+  executor: package_rtc_product
+```
+
+or:
+
+```yaml
+model:
+  executor:
+    name: package_rtc_product
+    artifact: "{prediction_dir}/rtc_backscatter.tif"
+```
+
+For command-driven runtimes such as `python-minimal`, LeoFlow expands that shorthand using these defaults:
+
+- script path: `tasks/custom/<name>.py`
+- workflow argument: `--workflow "{workflow_dir}/workflow.yaml"`
+- input argument: `--input "{input_dir}"`
+- output argument: `--output "{prediction_dir}/<model.output>.tif"`
+
+Users can still override the generated behavior by supplying explicit `run`, `script`, or `artifact` fields.
+
 ## `evaluation`
 
 Evaluation configuration.
@@ -292,6 +336,23 @@ evaluation:
     run: python3 tasks/custom/evaluate.py --predictions "{prediction_dir}" --report "{outputs_dir}/evaluation/evaluation.json"
     artifact: "{outputs_dir}/evaluation/evaluation.json"
 ```
+
+`evaluation.executor` supports the same shorthand:
+
+```yaml
+evaluation:
+  metrics:
+    - raster_stats
+  executor: evaluate_rtc_product
+```
+
+For command-driven runtimes such as `python-minimal`, LeoFlow expands that shorthand using these defaults:
+
+- script path: `tasks/custom/<name>.py`
+- workflow argument: `--workflow "{workflow_dir}/workflow.yaml"`
+- prediction argument: `--prediction "{prediction_path}"`
+- report argument: `--report "{outputs_dir}/evaluation/<name>.json"`
+- artifact path: `"{outputs_dir}/evaluation/<name>.json"`
 
 ## `publication`
 

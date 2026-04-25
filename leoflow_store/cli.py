@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -29,16 +31,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Create a workflow project.",
         description=(
             "Create a workflow project in the given output directory "
-            "from an example workflow template."
+            "from an example workflow template or an existing workflow spec."
         ),
     )
     create_parser.add_argument("name", help="Workflow name.")
     create_parser.add_argument("output", help="Directory where the workflow project should be created.")
-    create_parser.add_argument(
+    create_source_group = create_parser.add_mutually_exclusive_group()
+    create_source_group.add_argument(
         "--template",
-        default=DEFAULT_EXAMPLE_TEMPLATE,
+        default=None,
         choices=example_template_names(),
         help="Example workflow template to create from.",
+    )
+    create_source_group.add_argument(
+        "--workflow",
+        help="Workflow directory or workflow.yaml path to create from.",
     )
     create_parser.add_argument(
         "--runtime-template",
@@ -187,10 +194,12 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _handle_create(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
+    workflow_path = _resolve_workflow_path(args.workflow) if args.workflow else None
     created = create_project(
         args.name,
         Path(args.output),
         workflow_template=args.template,
+        workflow_path=workflow_path,
         runtime_template=args.runtime_template,
     )
     print(f"created workflow project in {created}")
@@ -340,6 +349,12 @@ def _run_tests_in_dir(path: Path) -> None:
 
 def _run_workflow_in_dir(path: Path, *, setup: bool, venv_dir: str) -> None:
     python_executable = _resolve_python_for_run(path, setup=setup, venv_dir=venv_dir)
+    _ensure_requirements_available_for_run(
+        path,
+        python_executable=python_executable,
+        setup=setup,
+        venv_dir=venv_dir,
+    )
     subprocess.run([str(python_executable), "app.py"], cwd=path, check=True)
 
 
@@ -375,6 +390,72 @@ def _venv_python_path(venv_path: Path) -> Path:
     if sys.platform == "win32":
         return venv_path / "Scripts" / "python.exe"
     return venv_path / "bin" / "python"
+
+
+def _ensure_requirements_available_for_run(
+    path: Path,
+    *,
+    python_executable: Path,
+    setup: bool,
+    venv_dir: str,
+) -> None:
+    requirements_path = path / "requirements.txt"
+    if setup or not requirements_path.exists():
+        return
+
+    venv_python = _venv_python_path(path / venv_dir)
+    if python_executable == venv_python:
+        return
+    if python_executable != Path(sys.executable):
+        return
+
+    missing = _missing_requirements(requirements_path)
+    if not missing:
+        return
+
+    package_list = ", ".join(sorted(package for package, _ in missing))
+    raise RuntimeError(
+        f"project requirements are not installed in {python_executable}: missing {package_list}. "
+        f"Run `lf run {path} --setup` to create {venv_dir} and install requirements, "
+        f"or install them into the current interpreter with `python -m pip install -r {requirements_path}`."
+    )
+
+
+def _missing_requirements(requirements_path: Path) -> list[tuple[str, str]]:
+    missing: list[tuple[str, str]] = []
+    for package in _iter_requirement_names(requirements_path):
+        import_name = _requirement_import_name(package)
+        if importlib.util.find_spec(import_name) is None:
+            missing.append((package, import_name))
+    return missing
+
+
+def _iter_requirement_names(requirements_path: Path) -> list[str]:
+    names: list[str] = []
+    for raw_line in requirements_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith(("-r ", "--requirement ", "-c ", "--constraint ", "-e ", "--editable ")):
+            continue
+        match = re.match(r"^([A-Za-z0-9_.-]+)", line)
+        if match is None:
+            continue
+        names.append(match.group(1))
+    return names
+
+
+def _requirement_import_name(package: str) -> str:
+    aliases = {
+        "opencv-python": "cv2",
+        "pillow": "PIL",
+        "pyyaml": "yaml",
+        "python-dateutil": "dateutil",
+        "scikit-image": "skimage",
+        "scikit-learn": "sklearn",
+    }
+    normalized = package.strip().lower()
+    return aliases.get(normalized, normalized.replace("-", "_"))
 
 
 def _confirm_or_exit(assume_yes: bool, prompt: str) -> None:

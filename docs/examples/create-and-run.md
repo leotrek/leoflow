@@ -23,6 +23,12 @@ lf create wildfire-demo ./wildfire-demo --template wildfire-detection
 
 This generates a runnable project in `./wildfire-demo`.
 
+You can also create from an existing workflow spec instead:
+
+```bash
+lf create wildfire-demo ./wildfire-demo --workflow examples/wildfire-detection/workflow.yaml
+```
+
 ## 3. Inspect the generated project
 
 Important files:

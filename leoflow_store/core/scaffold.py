@@ -16,11 +16,19 @@ def create_project(
     output_dir: str | Path,
     *,
     runtime_template: str = DEFAULT_TEMPLATE,
-    workflow_template: str = DEFAULT_EXAMPLE_TEMPLATE,
+    workflow_template: str | None = DEFAULT_EXAMPLE_TEMPLATE,
+    workflow_path: str | Path | None = None,
     examples_root: str | Path | None = None,
 ) -> Path:
-    template_info = load_example(workflow_template, examples_root=examples_root)
-    spec = copy.deepcopy(template_info["spec"])
+    if workflow_path is not None:
+        resolved_workflow_path = Path(workflow_path)
+        spec = validate_workflow_spec(load_workflow(resolved_workflow_path))
+    else:
+        template_name = workflow_template or DEFAULT_EXAMPLE_TEMPLATE
+        template_info = load_example(template_name, examples_root=examples_root)
+        resolved_workflow_path = template_info["workflow_path"]
+        spec = copy.deepcopy(template_info["spec"])
+
     spec["workflow"]["name"] = project_name
     spec = validate_workflow_spec(spec)
     version = resolve_version(spec)
@@ -29,7 +37,7 @@ def create_project(
         version,
         runtime_template,
         Path(output_dir),
-        workflow_path=template_info["workflow_path"],
+        workflow_path=resolved_workflow_path,
     )
 
 

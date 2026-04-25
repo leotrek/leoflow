@@ -18,7 +18,11 @@ It lets you:
 Install the CLI locally:
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 python -m pip install -e .
+```
+```
 lf help
 ```
 Uninstall:
@@ -46,6 +50,12 @@ Create a project from an example workflow:
 
 ```bash
 lf create wildfire-demo ./wildfire-demo --template wildfire-detection
+```
+
+Create a project from your own workflow spec:
+
+```bash
+lf create wildfire-demo ./wildfire-demo --workflow examples/wildfire-detection/workflow.yaml
 ```
 
 Run the generated project:
@@ -96,7 +106,7 @@ lf test build/wildfire-detection
 
 ## Main Commands
 
-- `lf create`: create a new project from an example workflow template
+- `lf create`: create a new project from an example workflow template or an existing workflow spec
 - `lf list`: list example workflow templates, or registry entries with `--registry`
 - `lf build`: generate a runnable project from a workflow spec
 - `lf run`: run a generated project directly or generate-and-run from a workflow spec

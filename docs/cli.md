@@ -19,7 +19,7 @@ lf test ./my-workflow
 
 ## Top-Level Commands
 
-- `lf create`: create a new project from an example workflow template
+- `lf create`: create a new project from an example workflow template or a workflow spec
 - `lf list`: list example workflow templates or registry entries
 - `lf build`: build a runnable project from a workflow spec
 - `lf run`: run a generated project directly or generate-and-run from a workflow spec
@@ -29,10 +29,10 @@ lf test ./my-workflow
 
 ## `lf create`
 
-Create a project directory from one of the example workflow templates.
+Create a project directory from one of the example workflow templates or from an existing workflow spec.
 
 ```bash
-lf create <name> <output> [--template <example-name>] [--runtime-template <runtime-template>]
+lf create <name> <output> [--template <example-name> | --workflow <workflow-dir-or-yaml>] [--runtime-template <runtime-template>]
 ```
 
 Arguments:
@@ -43,6 +43,7 @@ Arguments:
 Options:
 
 - `--template`: example workflow template name from `examples/`
+- `--workflow`: workflow directory or `workflow.yaml` to create from
 - `--runtime-template`: code-generation backend, default `python-minimal`
 
 Example:
@@ -51,9 +52,13 @@ Example:
 lf create wildfire-demo ./wildfire-demo --template wildfire-detection
 ```
 
+```bash
+lf create wildfire-demo ./wildfire-demo --workflow examples/wildfire-detection/workflow.yaml
+```
+
 This command:
 
-1. loads `examples/wildfire-detection/workflow.yaml`
+1. loads the selected example workflow or the workflow you passed with `--workflow`
 2. replaces `workflow.name` with `wildfire-demo`
 3. generates a new runnable project in `./wildfire-demo`
 
@@ -198,6 +203,7 @@ lf help build
 There are two different kinds of template names in LeoFlow:
 
 - example workflow templates, used by `lf create --template`
+- existing workflow specs, used by `lf create --workflow`
 - runtime templates, used by `lf create --runtime-template`, `lf build --template`, and `lf test --template`
 
 Examples:
