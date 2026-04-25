@@ -12,8 +12,8 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from runtime.task_support import load_workflow, write_json
-from tasks.lib.sar import (
+from runtime.task_support import load_workflow, write_json  # noqa: E402
+from tasks.lib.sar import (  # noqa: E402
     apply_aoi_mask,
     find_raster,
     load_region_geometries,
@@ -24,7 +24,13 @@ from tasks.lib.sar import (
 )
 
 
-def _project_and_mask(workflow_path: str, source_path: Path, profile: dict[str, object], *, nearest: bool = False) -> np.ndarray:
+def _project_and_mask(
+    workflow_path: str,
+    source_path: Path,
+    profile: dict[str, object],
+    *,
+    nearest: bool = False,
+) -> np.ndarray:
     geometries = load_region_geometries(workflow_path, target_crs=profile["crs"])
     projected = reproject_raster(
         source_path,
@@ -65,7 +71,9 @@ def main() -> int:
         artifacts.append(str(output_path))
 
     if not artifacts:
-        raise RuntimeError("calibrate_and_geocode could not find VV/VH rasters in the focusing output")
+        raise RuntimeError(
+            "calibrate_and_geocode could not find VV/VH rasters in the focusing output"
+        )
 
     angle_path = find_raster(input_dir, "local_incidence_angle", "incidence_angle", "angle", required=False)
     if angle_path is not None:

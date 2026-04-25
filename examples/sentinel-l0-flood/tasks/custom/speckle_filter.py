@@ -9,8 +9,14 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from runtime.task_support import load_workflow, write_json
-from tasks.lib.sar import copy_raster, find_raster, mean_filter, read_raster, write_float_raster
+from runtime.task_support import load_workflow, write_json  # noqa: E402
+from tasks.lib.sar import (  # noqa: E402
+    copy_raster,
+    find_raster,
+    mean_filter,
+    read_raster,
+    write_float_raster,
+)
 
 
 def main() -> int:
@@ -37,7 +43,9 @@ def main() -> int:
         artifacts.append(str(output_path))
 
     if not artifacts:
-        raise RuntimeError("speckle_filter could not find any sigma0 rasters to smooth")
+        raise RuntimeError(
+            "speckle_filter could not find any sigma0 rasters to smooth"
+        )
 
     angle_path = find_raster(input_dir, "local_incidence_angle", required=False)
     if angle_path is not None:

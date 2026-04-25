@@ -233,12 +233,58 @@ def mean_filter(values: np.ndarray, *, kernel_size: int = 3) -> np.ndarray:
     counts = np.zeros(values.shape, dtype="float32")
     for row in range(kernel_size):
         for col in range(kernel_size):
-            total += padded_values[row : row + values.shape[0], col : col + values.shape[1]]
-            counts += padded_counts[row : row + values.shape[0], col : col + values.shape[1]]
+            total += padded_values[row: row + values.shape[0], col: col + values.shape[1]]
+            counts += padded_counts[row: row + values.shape[0], col: col + values.shape[1]]
     filtered = np.full(values.shape, np.nan, dtype="float32")
     valid = counts > 0.0
     filtered[valid] = total[valid] / counts[valid]
     return filtered
+
+
+_NEIGHBOR_OFFSETS = (
+    (-1, -1),
+    (-1, 0),
+    (-1, 1),
+    (0, -1),
+    (0, 1),
+    (1, -1),
+    (1, 0),
+    (1, 1),
+)
+
+
+def _neighbor_pixels(row: int, col: int, height: int, width: int) -> list[tuple[int, int]]:
+    neighbors: list[tuple[int, int]] = []
+    for d_row, d_col in _NEIGHBOR_OFFSETS:
+        next_row = row + d_row
+        next_col = col + d_col
+        if next_row < 0 or next_col < 0 or next_row >= height or next_col >= width:
+            continue
+        neighbors.append((next_row, next_col))
+    return neighbors
+
+
+def _collect_component(
+    source: np.ndarray,
+    visited: np.ndarray,
+    row: int,
+    col: int,
+) -> list[tuple[int, int]]:
+    height, width = source.shape
+    component: list[tuple[int, int]] = []
+    queue: deque[tuple[int, int]] = deque([(row, col)])
+    visited[row, col] = True
+
+    while queue:
+        current_row, current_col = queue.popleft()
+        component.append((current_row, current_col))
+        for next_row, next_col in _neighbor_pixels(current_row, current_col, height, width):
+            if visited[next_row, next_col] or not source[next_row, next_col]:
+                continue
+            visited[next_row, next_col] = True
+            queue.append((next_row, next_col))
+
+    return component
 
 
 def remove_small_regions(mask: np.ndarray, min_pixels: int) -> np.ndarray:
@@ -249,36 +295,12 @@ def remove_small_regions(mask: np.ndarray, min_pixels: int) -> np.ndarray:
     visited = np.zeros(source.shape, dtype=bool)
     kept = np.zeros(source.shape, dtype=bool)
     height, width = source.shape
-    neighbors = (
-        (-1, -1),
-        (-1, 0),
-        (-1, 1),
-        (0, -1),
-        (0, 1),
-        (1, -1),
-        (1, 0),
-        (1, 1),
-    )
 
     for row in range(height):
         for col in range(width):
             if visited[row, col] or not source[row, col]:
                 continue
-            component: list[tuple[int, int]] = []
-            queue: deque[tuple[int, int]] = deque([(row, col)])
-            visited[row, col] = True
-            while queue:
-                current_row, current_col = queue.popleft()
-                component.append((current_row, current_col))
-                for d_row, d_col in neighbors:
-                    next_row = current_row + d_row
-                    next_col = current_col + d_col
-                    if next_row < 0 or next_col < 0 or next_row >= height or next_col >= width:
-                        continue
-                    if visited[next_row, next_col] or not source[next_row, next_col]:
-                        continue
-                    visited[next_row, next_col] = True
-                    queue.append((next_row, next_col))
+            component = _collect_component(source, visited, row, col)
             if len(component) >= min_pixels:
                 for current_row, current_col in component:
                     kept[current_row, current_col] = True

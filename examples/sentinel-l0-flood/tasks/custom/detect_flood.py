@@ -11,8 +11,8 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from runtime.task_support import load_workflow, write_json
-from tasks.lib.sar import (
+from runtime.task_support import load_workflow, write_json  # noqa: E402
+from tasks.lib.sar import (  # noqa: E402
     find_raster,
     linear_to_db,
     mask_to_feature_collection,
@@ -59,7 +59,9 @@ def main() -> int:
     if bool(detection.get("use_pre_event_change", True)) and pre_event_vv_path is not None:
         pre_event_vv, _ = read_raster(pre_event_vv_path)
         change_db = linear_to_db(vv) - linear_to_db(pre_event_vv)
-        flood &= np.isfinite(change_db) & (change_db <= float(detection.get("change_threshold_db", -1.5)))
+        flood &= np.isfinite(change_db) & (
+            change_db <= float(detection.get("change_threshold_db", -1.5))
+        )
         used_pre_event = True
 
     flood = remove_small_regions(flood, int(postprocess.get("min_region_pixels", 25)))
@@ -91,7 +93,11 @@ def main() -> int:
     ):
         overlay_mask = rasterize_resource(args.workflow, resources.get(name, default_path), profile)
         if overlay_mask is None:
-            overlay_stats[name] = {"present": False, "flooded_pixels": 0, "flooded_area_km2": 0.0}
+            overlay_stats[name] = {
+                "present": False,
+                "flooded_pixels": 0,
+                "flooded_area_km2": 0.0,
+            }
             continue
         flooded_pixels = int(np.logical_and(flood, overlay_mask).sum())
         overlay_stats[name] = {

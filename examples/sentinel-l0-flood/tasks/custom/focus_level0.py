@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from runtime.task_support import load_workflow, project_root, write_json
+from runtime.task_support import load_workflow, project_root, write_json  # noqa: E402
 
 
 def _iter_tiffs(root: str | Path) -> list[Path]:
@@ -57,8 +57,18 @@ def _pair_paths(
     prefix: str | None = None,
     exclude_parts: tuple[str, ...] = (),
 ) -> tuple[Path | None, Path | None]:
-    vv_names = ["vv", "sigma0_vv", "post_event_vv" if prefix is None else f"{prefix}_vv", "post_event_sigma0_vv"]
-    vh_names = ["vh", "sigma0_vh", "post_event_vh" if prefix is None else f"{prefix}_vh", "post_event_sigma0_vh"]
+    vv_names = [
+        "vv",
+        "sigma0_vv",
+        "post_event_vv" if prefix is None else f"{prefix}_vv",
+        "post_event_sigma0_vv",
+    ]
+    vh_names = [
+        "vh",
+        "sigma0_vh",
+        "post_event_vh" if prefix is None else f"{prefix}_vh",
+        "post_event_sigma0_vh",
+    ]
     vv_path = _match_candidates(roots, *vv_names, exclude_parts=exclude_parts)
     vh_path = _match_candidates(roots, *vh_names, exclude_parts=exclude_parts)
     return vv_path, vh_path
@@ -71,7 +81,11 @@ def _copy_pair(
     prefix: str | None = None,
     exclude_parts: tuple[str, ...] = (),
 ) -> list[str]:
-    vv_path, vh_path = _pair_paths(source_roots, prefix=prefix, exclude_parts=exclude_parts)
+    vv_path, vh_path = _pair_paths(
+        source_roots,
+        prefix=prefix,
+        exclude_parts=exclude_parts,
+    )
     if vv_path is None or vh_path is None:
         return []
 

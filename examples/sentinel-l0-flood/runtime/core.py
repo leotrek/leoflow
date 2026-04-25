@@ -346,7 +346,11 @@ class WorkflowApp:
             "prediction_artifact": context["prediction"].get("artifact"),
         }
         if context["evaluation"].get("tasks"):
-            artifacts["evaluation_reports"] = [task["artifact"] for task in context["evaluation"]["tasks"] if task.get("artifact")]
+            artifacts["evaluation_reports"] = [
+                task["artifact"]
+                for task in context["evaluation"]["tasks"]
+                if task.get("artifact")
+            ]
         return {
             "workflow": self.spec["workflow"]["name"],
             "runtime": self.runtime_name,

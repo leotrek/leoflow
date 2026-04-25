@@ -234,7 +234,26 @@ def _filter_opera_items(
         orbit_filtered = [item for item in filtered if int(item.get("absoluteOrbit") or -1) == absolute_orbit]
         if orbit_filtered:
             filtered = orbit_filtered
-    return sorted(filtered, key=lambda item: _parse_timestamp(str(item.get("startTime") or "1970-01-01T00:00:00Z")))
+    return sorted(filtered, key=_item_start_time)
+
+
+def _item_start_time(item: dict[str, Any]) -> datetime:
+    return _parse_timestamp(str(item.get("startTime") or "1970-01-01T00:00:00Z"))
+
+
+def _item_value(item: dict[str, Any], key: str) -> str:
+    return str(item.get(key) or "").strip()
+
+
+def _prefer_matching_items(
+    items: list[dict[str, Any]],
+    key: str,
+    expected: str,
+) -> list[dict[str, Any]]:
+    if not expected:
+        return items
+    matches = [item for item in items if _item_value(item, key) == expected]
+    return matches or items
 
 
 def _select_previous_opera_items(
@@ -247,42 +266,26 @@ def _select_previous_opera_items(
         return []
 
     reference = reference_items[0]
-    platform = str(reference.get("platform") or "").strip()
-    relative_orbit = str(reference.get("relativeOrbit") or "").strip()
-    track = str(reference.get("track") or "").strip()
-    flight_direction = str(reference.get("flightDirection") or "").strip()
-
-    candidates = [
-        item
-        for item in items
-        if _parse_timestamp(str(item.get("startTime") or "1970-01-01T00:00:00Z")) < before
-    ]
-    if platform:
-        platform_candidates = [item for item in candidates if str(item.get("platform") or "").strip() == platform]
-        if platform_candidates:
-            candidates = platform_candidates
-    if relative_orbit:
-        orbit_candidates = [item for item in candidates if str(item.get("relativeOrbit") or "").strip() == relative_orbit]
-        if orbit_candidates:
-            candidates = orbit_candidates
-    if track:
-        track_candidates = [item for item in candidates if str(item.get("track") or "").strip() == track]
-        if track_candidates:
-            candidates = track_candidates
-    if flight_direction:
-        direction_candidates = [
-            item for item in candidates if str(item.get("flightDirection") or "").strip() == flight_direction
-        ]
-        if direction_candidates:
-            candidates = direction_candidates
-
+    candidates = [item for item in items if _item_start_time(item) < before]
+    candidates = _prefer_matching_items(candidates, "platform", _item_value(reference, "platform"))
+    candidates = _prefer_matching_items(
+        candidates,
+        "relativeOrbit",
+        _item_value(reference, "relativeOrbit"),
+    )
+    candidates = _prefer_matching_items(candidates, "track", _item_value(reference, "track"))
+    candidates = _prefer_matching_items(
+        candidates,
+        "flightDirection",
+        _item_value(reference, "flightDirection"),
+    )
     if not candidates:
         return []
 
-    latest = max(candidates, key=lambda item: _parse_timestamp(str(item.get("startTime") or "1970-01-01T00:00:00Z")))
+    latest = max(candidates, key=_item_start_time)
     selected_orbit = int(latest.get("absoluteOrbit") or -1)
     selected = [item for item in candidates if int(item.get("absoluteOrbit") or -2) == selected_orbit]
-    return sorted(selected, key=lambda item: _parse_timestamp(str(item.get("startTime") or "1970-01-01T00:00:00Z")))
+    return sorted(selected, key=_item_start_time)
 
 
 def _opera_asset_urls(item: dict[str, Any]) -> dict[str, str]:
@@ -429,7 +432,15 @@ def _download_opera_rtc_fallback(
         return [], None
 
     downloaded_assets: list[str] = []
-    downloaded_assets.extend(_download_opera_pair(post_items, post_event_dir, prefix=None, username=username, password=password))
+    downloaded_assets.extend(
+        _download_opera_pair(
+            post_items,
+            post_event_dir,
+            prefix=None,
+            username=username,
+            password=password,
+        )
+    )
 
     pre_items: list[dict[str, Any]] = []
     pre_query = {
@@ -497,13 +508,19 @@ def main(ctx):
                 if password_source:
                     raise RuntimeError(
                         f"download.auth_type is earthdata_basic but no password was found. "
-                        f"Set the {password_source} environment variable or put data.provider.auth.password in workflow.yaml."
+                        f"Set the {password_source} environment variable or put "
+                        "data.provider.auth.password in workflow.yaml."
                     )
                 raise RuntimeError(
                     "download.auth_type is earthdata_basic but no password is configured. "
-                    "Set data.provider.auth.password_env and export that variable, or put data.provider.auth.password in workflow.yaml."
+                    "Set data.provider.auth.password_env and export that variable, "
+                    "or put data.provider.auth.password in workflow.yaml."
                 )
-        filename = str(download.get("filename") or Path(urlparse(url).path).name or "sentinel-1-product.zip")
+        filename = str(
+            download.get("filename")
+            or Path(urlparse(url).path).name
+            or "sentinel-1-product.zip"
+        )
         archive_path = _download_with_auth(url, downloads_dir / filename, username, password)
         downloaded_assets.append(str(archive_path))
         downloaded_assets.extend(_extract_archive(archive_path, extracted_dir))

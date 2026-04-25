@@ -26,37 +26,13 @@ def validate_workflow_spec(spec: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
     normalized = copy.deepcopy(spec)
 
-    if not isinstance(normalized.get("workflow"), dict):
-        errors.append("workflow must be a mapping")
-    elif not normalized["workflow"].get("name"):
-        errors.append("workflow.name is required")
-
+    _validate_workflow_section(normalized, errors)
     _require_mapping_keys(normalized, "data", ["source", "region", "time", "resolution"], errors)
     _require_mapping_keys(normalized, "model", ["type", "input", "output"], errors)
-
-    features = normalized.get("features")
-    if not isinstance(features, list) or not features:
-        errors.append("features must be a non-empty list")
-
-    preprocessing = normalized.get("preprocessing")
-    if not isinstance(preprocessing, list) or not preprocessing:
-        errors.append("preprocessing must be a non-empty list")
-    else:
-        normalized["preprocessing"] = _normalize_preprocessing(preprocessing, errors)
-        for index, step in enumerate(normalized["preprocessing"], start=1):
-            if not isinstance(step, dict) or len(step) != 1:
-                errors.append(f"preprocessing step {index} must be a single-key mapping")
-
-    model = normalized.get("model")
-    if isinstance(model, dict):
-        _normalize_executor_field(model, "model", errors)
-
-    evaluation = normalized.get("evaluation")
-    metrics = evaluation.get("metrics") if isinstance(evaluation, dict) else None
-    if not isinstance(metrics, list) or not metrics:
-        errors.append("evaluation.metrics must be a non-empty list")
-    elif isinstance(evaluation, dict):
-        _normalize_executor_field(evaluation, "evaluation", errors)
+    _validate_features_section(normalized, errors)
+    _validate_preprocessing_section(normalized, errors)
+    _validate_model_section(normalized, errors)
+    _validate_evaluation_section(normalized, errors)
 
     if errors:
         message = "invalid workflow spec:\n- " + "\n- ".join(errors)
@@ -65,6 +41,48 @@ def validate_workflow_spec(spec: dict[str, Any]) -> dict[str, Any]:
     normalized["workflow"]["slug"] = workflow_slug(normalized)
     normalized["workflow"]["version"] = resolve_version(normalized)
     return normalized
+
+
+def _validate_workflow_section(spec: dict[str, Any], errors: list[str]) -> None:
+    workflow = spec.get("workflow")
+    if not isinstance(workflow, dict):
+        errors.append("workflow must be a mapping")
+        return
+    if not workflow.get("name"):
+        errors.append("workflow.name is required")
+
+
+def _validate_features_section(spec: dict[str, Any], errors: list[str]) -> None:
+    features = spec.get("features")
+    if not isinstance(features, list) or not features:
+        errors.append("features must be a non-empty list")
+
+
+def _validate_preprocessing_section(spec: dict[str, Any], errors: list[str]) -> None:
+    preprocessing = spec.get("preprocessing")
+    if not isinstance(preprocessing, list) or not preprocessing:
+        errors.append("preprocessing must be a non-empty list")
+        return
+
+    spec["preprocessing"] = _normalize_preprocessing(preprocessing, errors)
+    for index, step in enumerate(spec["preprocessing"], start=1):
+        if not isinstance(step, dict) or len(step) != 1:
+            errors.append(f"preprocessing step {index} must be a single-key mapping")
+
+
+def _validate_model_section(spec: dict[str, Any], errors: list[str]) -> None:
+    model = spec.get("model")
+    if isinstance(model, dict):
+        _normalize_executor_field(model, "model", errors)
+
+
+def _validate_evaluation_section(spec: dict[str, Any], errors: list[str]) -> None:
+    evaluation = spec.get("evaluation")
+    metrics = evaluation.get("metrics") if isinstance(evaluation, dict) else None
+    if not isinstance(metrics, list) or not metrics:
+        errors.append("evaluation.metrics must be a non-empty list")
+        return
+    _normalize_executor_field(evaluation, "evaluation", errors)
 
 
 def _require_mapping_keys(

@@ -14,7 +14,6 @@ from leoflow_store.core.generator import DEFAULT_TEMPLATE, generate_project, tem
 from leoflow_store.core.parser import load_workflow
 from leoflow_store.core.registry import WorkflowRegistry
 from leoflow_store.core.scaffold import (
-    DEFAULT_EXAMPLE_TEMPLATE,
     create_project,
     example_template_names,
     list_examples,
