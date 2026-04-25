@@ -391,8 +391,14 @@ class ExecutableRuntimeTest(unittest.TestCase):
             self.assertTrue((rtc_dir / "B04.tif").exists())
             self.assertTrue(prediction_path.exists())
             self.assertTrue(evaluation_path.exists())
-            self.assertIn("[start] command python3 tasks/custom/focus_raw.py", result.stderr)
-            self.assertIn("[start] command python3 tasks/custom/package_rtc_product.py", result.stderr)
+            self.assertIn(
+                f"[start] command {sys.executable} tasks/custom/focus_raw.py",
+                result.stderr,
+            )
+            self.assertIn(
+                f"[start] command {sys.executable} tasks/custom/package_rtc_product.py",
+                result.stderr,
+            )
             self.assertEqual(Path(payload["prediction"]["artifact"]).resolve(), prediction_path.resolve())
             self.assertEqual(
                 Path(payload["evaluation"]["executor"]["artifact"]).resolve(),

@@ -14,7 +14,7 @@ from leoflow_store.core.validator import resolve_version, validate_workflow_spec
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXAMPLE = ROOT / "examples" / "wildfire-detection.yaml"
+EXAMPLE = ROOT / "examples" / "wildfire-detection" / "workflow.yaml"
 
 
 class StoreSmokeTest(unittest.TestCase):
