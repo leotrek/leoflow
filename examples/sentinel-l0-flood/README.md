@@ -1,4 +1,4 @@
-# sentinel-l0-flood
+# sentinel-L0-flood
 
 Sentinel-1 flood mapping example for LeoFlow. This example is configured around one Sentinel-1C acquisition over eastern Austria on April 25, 2026 and produces raster, vector, and JSON flood outputs.
 
