@@ -1,0 +1,780 @@
+[start] stage load_data at 2026-04-25T04:51:39Z
+[start] task data/stac_sentinel_2 at 2026-04-25T04:51:39Z
+[finish] task data/stac_sentinel_2 at 2026-04-25T04:51:44Z duration=4.492s
+[finish] stage load_data at 2026-04-25T04:51:44Z duration=4.493s
+[start] stage preprocess at 2026-04-25T04:51:44Z
+[start] task preprocessing/pre_fire_composite at 2026-04-25T04:51:44Z
+[finish] task preprocessing/pre_fire_composite at 2026-04-25T04:53:06Z duration=82.537s
+[start] task preprocessing/post_fire_composite at 2026-04-25T04:53:06Z
+[finish] task preprocessing/post_fire_composite at 2026-04-25T04:53:07Z duration=0.820s
+[start] task preprocessing/reproject at 2026-04-25T04:53:07Z
+[finish] task preprocessing/reproject at 2026-04-25T04:53:08Z duration=0.918s
+[start] task preprocessing/resample at 2026-04-25T04:53:08Z
+[finish] task preprocessing/resample at 2026-04-25T04:53:09Z duration=0.916s
+[start] task preprocessing/align_grid at 2026-04-25T04:53:09Z
+[finish] task preprocessing/align_grid at 2026-04-25T04:53:10Z duration=0.920s
+[finish] stage preprocess at 2026-04-25T04:53:10Z duration=86.117s
+[start] stage extract_features at 2026-04-25T04:53:10Z
+[start] task features/pre_fire_nbr at 2026-04-25T04:53:10Z
+[finish] task features/pre_fire_nbr at 2026-04-25T04:53:13Z duration=3.101s
+[start] task features/post_fire_nbr at 2026-04-25T04:53:13Z
+[finish] task features/post_fire_nbr at 2026-04-25T04:53:16Z duration=3.087s
+[start] task features/delta_nbr at 2026-04-25T04:53:16Z
+[finish] task features/delta_nbr at 2026-04-25T04:53:21Z duration=5.592s
+[finish] stage extract_features at 2026-04-25T04:53:21Z duration=11.784s
+[start] stage run_model at 2026-04-25T04:53:21Z
+[start] task model/burned_area_mask at 2026-04-25T04:53:21Z
+[finish] task model/burned_area_mask at 2026-04-25T04:53:30Z duration=8.199s
+[finish] stage run_model at 2026-04-25T04:53:30Z duration=8.202s
+[start] stage evaluate at 2026-04-25T04:53:30Z
+[start] task evaluation/burned_area_ha at 2026-04-25T04:53:30Z
+[finish] task evaluation/burned_area_ha at 2026-04-25T04:53:31Z duration=1.199s
+[start] task evaluation/gwis_overlay at 2026-04-25T04:53:31Z
+[finish] task evaluation/gwis_overlay at 2026-04-25T04:53:32Z duration=1.140s
+[finish] stage evaluate at 2026-04-25T04:53:32Z duration=2.342s
+[start] stage build_output at 2026-04-25T04:53:32Z
+[finish] stage build_output at 2026-04-25T04:53:32Z duration=0.000s
+{
+"workflow": "iberia-wildfire-detection",
+"runtime": "python-minimal",
+"status": "completed",
+"data": {
+"status": "loaded",
+"summary": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/stac_sentinel_2.json",
+"source": {
+"kind": "stac",
+"name": "stac_sentinel_2",
+"api_url": "https://earth-search.aws.element84.com/v1/search",
+"collection": "sentinel-2-l2a",
+"assets": [
+"nir",
+"swir22"
+],
+"limit": 100,
+"query": {
+"eo:cloud_cover": {
+"lt": 20
+}
+}
+},
+"region": "resources/aoi/feature.geojson",
+"time_range": "2020-08-07/2020-10-20",
+"windows": {
+"pre_fire": "2020-08-07/2020-09-06",
+"post_fire": "2020-09-20/2020-10-20"
+},
+"resolution": "10m",
+"periods": {
+"pre_fire": {
+"window": "2020-08-07/2020-09-06",
+"items": 13,
+"search_results": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/search-results-pre_fire.json",
+"downloaded_assets": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/swir22.tif"
+]
+},
+"post_fire": {
+"window": "2020-09-20/2020-10-20",
+"items": 8,
+"search_results": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/search-results-post_fire.json",
+"downloaded_assets": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/swir22.tif"
+]
+}
+},
+"downloaded_assets": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/swir22.tif"
+],
+"data_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw",
+"started_at": "2026-04-25T04:51:39Z",
+"finished_at": "2026-04-25T04:51:44Z",
+"duration_seconds": 4.492
+},
+"preprocessing": {
+"steps": [
+"pre_fire_composite:mean",
+"post_fire_composite:mean",
+"reproject:EPSG:32629",
+"resample:10m",
+"align_grid:post_fire"
+],
+"commands": [],
+"tasks": [
+{
+"status": "completed",
+"task": "pre_fire_composite",
+"config": "mean",
+"input_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw",
+"output_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"manifest": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire_composite.json",
+"periods": {
+"pre_fire": {
+"nir": {
+"scene_count": 13,
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/nir.tif",
+"stats": {
+"min": 1.0,
+"max": 6397.45556640625,
+"mean": 2368.0244140625
+}
+},
+"swir22": {
+"scene_count": 13,
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/swir22.tif",
+"stats": {
+"min": 26.38053321838379,
+"max": 6832.9970703125,
+"mean": 1500.4903564453125
+}
+}
+},
+"post_fire": {
+"nir": {
+"scene_count": 8,
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/nir.tif",
+"stats": {
+"min": 1.0,
+"max": 8830.3515625,
+"mean": 1999.407470703125
+}
+},
+"swir22": {
+"scene_count": 8,
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/swir22.tif",
+"stats": {
+"min": 5.785533428192139,
+"max": 6648.38232421875,
+"mean": 1212.710693359375
+}
+}
+}
+},
+"artifacts": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/swir22.tif"
+],
+"started_at": "2026-04-25T04:51:44Z",
+"finished_at": "2026-04-25T04:53:06Z",
+"duration_seconds": 82.537
+},
+{
+"status": "completed",
+"task": "post_fire_composite",
+"config": "mean",
+"input_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"output_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"manifest": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/post_fire_composite/post_fire_composite.json",
+"validated_artifacts": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/swir22.tif"
+],
+"started_at": "2026-04-25T04:53:06Z",
+"finished_at": "2026-04-25T04:53:07Z",
+"duration_seconds": 0.82
+},
+{
+"status": "completed",
+"task": "reproject",
+"config": "EPSG:32629",
+"input_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"output_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"manifest": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/reproject/reproject.json",
+"validated_artifacts": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/swir22.tif"
+],
+"started_at": "2026-04-25T04:53:07Z",
+"finished_at": "2026-04-25T04:53:08Z",
+"duration_seconds": 0.918
+},
+{
+"status": "completed",
+"task": "resample",
+"config": "10m",
+"input_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"output_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"manifest": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/resample/resample.json",
+"validated_artifacts": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/swir22.tif"
+],
+"started_at": "2026-04-25T04:53:08Z",
+"finished_at": "2026-04-25T04:53:09Z",
+"duration_seconds": 0.916
+},
+{
+"status": "completed",
+"task": "align_grid",
+"config": "post_fire",
+"input_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"output_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"manifest": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/align_grid/align_grid.json",
+"validated_artifacts": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/swir22.tif"
+],
+"started_at": "2026-04-25T04:53:09Z",
+"finished_at": "2026-04-25T04:53:10Z",
+"duration_seconds": 0.92
+}
+],
+"input_source": {
+"kind": "stac",
+"name": "stac_sentinel_2",
+"api_url": "https://earth-search.aws.element84.com/v1/search",
+"collection": "sentinel-2-l2a",
+"assets": [
+"nir",
+"swir22"
+],
+"limit": 100,
+"query": {
+"eo:cloud_cover": {
+"lt": 20
+}
+}
+},
+"output_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"status": "prepared",
+"started_at": "2026-04-25T04:51:44Z",
+"finished_at": "2026-04-25T04:53:10Z",
+"duration_seconds": 86.117
+},
+"features": {
+"names": [
+"pre_fire_nbr",
+"post_fire_nbr",
+"delta_nbr"
+],
+"count": 3,
+"input_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"output_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features",
+"artifacts": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/pre_fire_nbr.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/post_fire_nbr.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/delta_nbr.tif"
+],
+"tasks": [
+{
+"status": "completed",
+"name": "pre_fire_nbr",
+"input_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"summary": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/pre_fire_nbr.json",
+"stats": {
+"min": -0.9873698353767395,
+"max": 0.8101717233657837,
+"mean": 0.222412571310997
+},
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/pre_fire_nbr.tif",
+"started_at": "2026-04-25T04:53:10Z",
+"finished_at": "2026-04-25T04:53:13Z",
+"duration_seconds": 3.101
+},
+{
+"status": "completed",
+"name": "post_fire_nbr",
+"input_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"summary": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/post_fire_nbr.json",
+"stats": {
+"min": -0.9842419624328613,
+"max": 0.8738523125648499,
+"mean": 0.23851078748703003
+},
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/post_fire_nbr.tif",
+"started_at": "2026-04-25T04:53:13Z",
+"finished_at": "2026-04-25T04:53:16Z",
+"duration_seconds": 3.087
+},
+{
+"status": "completed",
+"name": "delta_nbr",
+"input_dir": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite",
+"summary": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/delta_nbr.json",
+"stats": {
+"min": -1.5482746362686157,
+"max": 1.2624895572662354,
+"mean": -0.016098227351903915
+},
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/delta_nbr.tif",
+"preview": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/delta_nbr_preview.png",
+"started_at": "2026-04-25T04:53:16Z",
+"finished_at": "2026-04-25T04:53:21Z",
+"duration_seconds": 5.592
+}
+],
+"status": "computed",
+"started_at": "2026-04-25T04:53:10Z",
+"finished_at": "2026-04-25T04:53:21Z",
+"duration_seconds": 11.784
+},
+"prediction": {
+"type": "threshold",
+"input": "delta_nbr",
+"output": "burned_area_mask",
+"model_path": null,
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.tif",
+"task": {
+"status": "executed",
+"name": "burned_area_mask",
+"summary": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.json",
+"threshold": 0.27,
+"burned_pixels": 233564,
+"burned_area_ha": 2335.64,
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.tif",
+"preview": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask_preview.png",
+"started_at": "2026-04-25T04:53:21Z",
+"finished_at": "2026-04-25T04:53:30Z",
+"duration_seconds": 8.199
+},
+"status": "executed",
+"started_at": "2026-04-25T04:53:21Z",
+"finished_at": "2026-04-25T04:53:30Z",
+"duration_seconds": 8.202
+},
+"evaluation": {
+"metrics": [
+"burned_area_ha",
+"gwis_overlay"
+],
+"prediction": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.tif",
+"tasks": [
+{
+"status": "completed",
+"name": "burned_area_ha",
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/evaluation/burned_area_ha.json",
+"burned_pixels": 233564,
+"burned_area_ha": 2335.64,
+"started_at": "2026-04-25T04:53:30Z",
+"finished_at": "2026-04-25T04:53:31Z",
+"duration_seconds": 1.199
+},
+{
+"status": "unavailable",
+"name": "gwis_overlay",
+"artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/evaluation/gwis_overlay.json",
+"score": null,
+"started_at": "2026-04-25T04:53:31Z",
+"finished_at": "2026-04-25T04:53:32Z",
+"duration_seconds": 1.14
+}
+],
+"status": "evaluated",
+"started_at": "2026-04-25T04:53:30Z",
+"finished_at": "2026-04-25T04:53:32Z",
+"duration_seconds": 2.342
+},
+"artifacts": {
+"artifact_root": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection",
+"inputs_root": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs",
+"output_root": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs",
+"reports_root": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/reports",
+"run_report": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/reports/last-run.json",
+"prediction_artifact": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.tif",
+"evaluation_reports": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/evaluation/burned_area_ha.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/evaluation/gwis_overlay.json"
+],
+"io_manifest": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/reports/io-manifest.json"
+},
+"started_at": "2026-04-25T04:53:32Z",
+"finished_at": "2026-04-25T04:53:32Z",
+"duration_seconds": 0.0,
+"inputs": {
+"input_root": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs",
+"workflow_yaml": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/workflow.yaml",
+"data": {
+"source": {
+"kind": "stac",
+"name": "stac_sentinel_2",
+"api_url": "https://earth-search.aws.element84.com/v1/search",
+"collection": "sentinel-2-l2a",
+"assets": [
+"nir",
+"swir22"
+],
+"limit": 100,
+"query": {
+"eo:cloud_cover": {
+"lt": 20
+}
+}
+},
+"region": "resources/aoi/feature.geojson",
+"time_range": "2020-08-07/2020-10-20",
+"resolution": "10m"
+},
+"local_files": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/resources/aoi/feature.geojson",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/workflow.yaml"
+],
+"raw_data_files": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/swir22.tif"
+],
+"model_files": [],
+"all_files": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/resources/aoi/feature.geojson",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/workflow.yaml"
+]
+},
+"outputs": {
+"output_root": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs",
+"primary_files": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/evaluation/burned_area_ha.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/evaluation/gwis_overlay.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.tif"
+],
+"files": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/evaluation/burned_area_ha.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/evaluation/gwis_overlay.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/delta_nbr.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/delta_nbr.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/delta_nbr_preview.png",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/post_fire_nbr.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/post_fire_nbr.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/pre_fire_nbr.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/pre_fire_nbr.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask_preview.png",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/align_grid/align_grid.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/post_fire_composite/post_fire_composite.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire_composite.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/reproject/reproject.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/resample/resample.json"
+]
+},
+"reports": {
+"report_root": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/reports",
+"files": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/reports/io-manifest.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/reports/last-run.json"
+]
+},
+"workflow_inputs": {
+"input_root": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs",
+"workflow_yaml": "/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/workflow.yaml",
+"data": {
+"source": {
+"kind": "stac",
+"name": "stac_sentinel_2",
+"api_url": "https://earth-search.aws.element84.com/v1/search",
+"collection": "sentinel-2-l2a",
+"assets": [
+"nir",
+"swir22"
+],
+"limit": 100,
+"query": {
+"eo:cloud_cover": {
+"lt": 20
+}
+}
+},
+"region": "resources/aoi/feature.geojson",
+"time_range": "2020-08-07/2020-10-20",
+"resolution": "10m"
+},
+"local_files": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/resources/aoi/feature.geojson",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/workflow.yaml"
+],
+"raw_data_files": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/swir22.tif"
+],
+"model_files": [],
+"all_files": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20200929_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201009_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2A_29TNG_20201016_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/post_fire/S2B_29TNG_20201011_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200807_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200830_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2A_29TNG_20200906_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200822_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200825_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200901_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_0_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/inputs/data/raw/pre_fire/S2B_29TNG_20200904_1_L2A/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/resources/aoi/feature.geojson",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/workflow.yaml"
+]
+},
+"output_files": [
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/evaluation/burned_area_ha.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/evaluation/gwis_overlay.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/delta_nbr.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/delta_nbr.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/delta_nbr_preview.png",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/post_fire_nbr.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/post_fire_nbr.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/pre_fire_nbr.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/features/pre_fire_nbr.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/predictions/burned_area_mask_preview.png",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/align_grid/align_grid.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/post_fire_composite/post_fire_composite.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/post_fire/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/nir.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire/swir22.tif",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/pre_fire_composite/pre_fire_composite.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/reproject/reproject.json",
+"/home/kenia/workspace/leoflow/examples/iberia-wildfire-detection/artifacts/iberia-wildfire-detection/outputs/preprocessed/resample/resample.json"
+]
+}
+ran /home/kenia/workspace/leoflow/examples/iberia-wildfire-detection
+
+real	1m55.448s
+user	1m35.222s
+sys	0m8.594s
